@@ -1,9 +1,14 @@
 # coding=utf-8
 from flask import Flask
 from booksapi import booksapi
+from tagsapi import tagsapi
+from usersapi import usersapi
 
 app = Flask(__name__)
 app.register_blueprint(booksapi)
+app.register_blueprint(tagsapi)
+app.register_blueprint(usersapi)
+
 """
 books = [
     {
@@ -44,32 +49,6 @@ tags = [
     }
 ]
 
-"""
-@app.route('/api/list', methods=['POST'])
-def add_list():
-    if not request.json or not 'content' in request.json:
-        abort(400);
-    listtmp = {
-        'id' : lists[-1]['id']+1,
-        'content' : request.json['content']
-    }
-    lists.append(listtmp)
-    return jsonify({'list':listtmp}), 201
-
-@app.route('/api/list/<int:list_id>', methods=['DELETE'])
-def del_list(list_id):
-    listtmp = [tmp for tmp in lists if tmp['id'] == list_id]
-    if len(listtmp) == 0:
-        abort(404)
-    lists.remove(listtmp[0])
-    return jsonify({'result':True})
-
-@app.route('/api/list/<int:list_id>', methods=['PUT'])
-def update_list(list_id):
-    listtmp = [tmp for tmp in lists if tmp['id'] == list_id]
-    if len(listtmp) == 0:
-        abort(404)
-"""
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

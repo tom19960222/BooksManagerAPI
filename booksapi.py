@@ -2,7 +2,7 @@
 #coding: UTF-8
 from flask import Blueprint, jsonify, abort, request
 
-booksapi = Blueprint('booksapi', __name__, url_prefix='/api/books')
+booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
 
 books = [
     {
@@ -54,16 +54,16 @@ def update_book(book_id):
     if len(tmpbook) == 0:
         abort(404)
     if not jsondata:
-	abort(400)
+        abort(400)
 
     if 'bookname' in request.json and type(request.json['bookname']) is unicode:
-	tmpbook[0]['bookname'] = jsondata['bookname']
+        tmpbook[0]['bookname'] = jsondata['bookname']
     if 'author' in request.json and type(request.json['author']) is unicode:
-	tmpbook[0]['author'] = jsondata['author']
+        tmpbook[0]['author'] = jsondata['author']
     if 'publisher' in request.json and type(request.json['publisher']) is unicode:
         tmpbook[0]['publisher'] = jsondata['publisher']
     if 'publish_date' in request.json and type(request.json['publish_date']) is unicode:
         tmpbook[0]['publish_date'] = jsondata['publish_date']
     if jsondata.get('price') is not None and type(jsondata['price']) is int:
-	books[0]['price'] = jsondata['price']
-    return jsonify({'book': tmpbook[0]})
+        books[0]['price'] = jsondata['price']
+        return jsonify({'book': tmpbook[0]})
