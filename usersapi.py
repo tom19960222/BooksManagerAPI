@@ -61,27 +61,30 @@ def add_user():
 
 @usersapi.route('/<int:user_id>', methods=['DELETE'])
 def del_user(user_id):
-    tmpuser = [tmpuser for tmpuser in users if tmpuser['user_id'] == user_id]
-    if len(tmpuser) == 0:
+    tmpuser = usersdb.find_one({'user_id': user_id})
+    if tmpuser is None:
         abort(404)
-    users.remove(tmpuser[0])
-    return jsonify({'result': True})
+
+    tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'deactivated': True}})
+    return dumps(tmpuser)
 
 
 @usersapi.route('/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
-    tmpuser = [tmpuser for tmpuser in users if tmpuser['user_id'] == user_id]
+    tmpuser = usersdb.find_one({'user_id': user_id})
     jsondata = request.get_json()
-    if len(tmpuser) == 0:
+    if tmpuser is None:
         abort(404)
     if not jsondata:
         abort(400)
 
-    if 'username' in request.json and type(request.json['username']) is unicode:
-        tmpuser[0]['username'] = jsondata['username']
-    if 'email' in request.json and type(request.json['email']) is unicode:
-        tmpuser[0]['email'] = jsondata['email']
-    if 'password' in request.json and type(request.json['password']) is unicode:
-        tmpuser[0]['password'] = jsondata['password']
-        return jsonify({'book': tmpuser[0]})
+    if 'username' in jsondata and type(jsondata['username']) is unicode:
+        tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'username': jsondata['username']}})
+    if 'email' in jsondata and type(jsondata['email']) is unicode:
+        tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'email': jsondata['email']}})
+    if 'password' in jsondata and type(jsondata['password']) is unicode:
+        tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'password': jsondata['password']}})
+
+    tmpuser = usersdb.find_one({'user_id': user_id}) #Get updated data.
+    return dumps(tmpuser)
 
