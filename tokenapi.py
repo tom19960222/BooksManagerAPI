@@ -37,7 +37,6 @@ def get_token():
 
 @tokenapi.route('/<token>', methods=["GET"])
 def get_token_by_token(token):
-    """tmptoken = [tmptoken for tmptoken in access_tokens if tmptoken['token'] == token]"""
     if token == "ALL":
         tmptoken = tokensdb.find()
     else:
