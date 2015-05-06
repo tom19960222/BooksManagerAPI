@@ -1,8 +1,14 @@
 #!/usr/bin/python
 #coding: UTF-8
 from flask import Blueprint, jsonify, abort, request
+from pymongo import MongoClient
+from bson.json_util import dumps
+import usersapi
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
+dbClient = MongoClient('163.13.128.116', 27017)
+db = dbClient.BooksManagerTest1
+booksdb = db.books
 
 books = [
     {
@@ -12,13 +18,17 @@ books = [
         'publisher' : u'尖端出版',
         'publish_date' : '20150101',
         'price' : 200,
-        'ISBN' : '1234567890'
+        'ISBN' : '1234567890',
+        'owned_user': [1,2]
     }
 ]
 
 @booksapi.route('', methods=['GET'])
 def list_all_books():
-    return jsonify({'books': books})
+    reqtoken = request.headers.get('Token')
+    tmpuserid = usersapi.get_user_id_by_token(reqtoken)
+    tmpbooks = booksdb.find({'owned_user': {'$in': [tmpuserid]}})
+    return dumps(tmpbooks)
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
@@ -31,7 +41,7 @@ def get_book_by_id(book_id):
 @booksapi.route('', methods=['POST'])
 def add_book():
     if not request.json or not 'bookname' in request.json:
-        abort(400);
+        abort(400)
     tmpbook = {
         'book_id' : books[-1]['book_id']+1,
         'bookname' : request.json['bookname']

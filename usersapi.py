@@ -8,6 +8,7 @@ usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')
 dbClient = MongoClient('163.13.128.116', 27017)
 db = dbClient.BooksManagerTest1
 usersdb = db.users
+tokensdb = db.tokens
 
 users = [
     {
@@ -87,3 +88,8 @@ def update_user(user_id):
     tmpuser = usersdb.find_one({'user_id': user_id}) #Get updated data.
     return dumps(tmpuser)
 
+#@usersapi.route('/with_token/<token>', methods=['GET'])
+def get_user_id_by_token(token):
+    tmptoken = tokensdb.find_one({'token': token})
+    return tmptoken['user_id']
+#    return jsonify({"user_id": tmptoken['user_id']})
