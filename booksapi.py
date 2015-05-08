@@ -32,16 +32,23 @@ def list_all_books():
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
-    tmpbooks = [tmpbook for tmpbook in books if tmpbook['book_id'] == book_id]
-
-    if len(tmpbooks) == 0:
-        abort(404)
-    return jsonify({'books': tmpbooks[0]})
+    #tmpbooks = [tmpbook for tmpbook in books if tmpbook['book_id'] == book_id]
+    reqtoken = request.headers.get('Token')
+    tmpuserid = usersapi.get_user_id_by_token(reqtoken)
+    tmpbooks = booksdb.find({'$and': [{'owned_user': {'$in': [tmpuserid]}}, {'book_id': book_id}]})
+    return dumps(tmpbooks)
 
 @booksapi.route('', methods=['POST'])
 def add_book():
     if not request.json or not 'bookname' in request.json:
         abort(400)
+    tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
+    for book in tmpbooks:
+        lastbook = book
+    new_user_id = 1
+    if lastbook['user_id'] is not None:
+        new_user_id = int(lastbook['book_id'])+1
+
     tmpbook = {
         'book_id' : books[-1]['book_id']+1,
         'bookname' : request.json['bookname']
