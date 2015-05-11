@@ -22,14 +22,16 @@ def generateAccessToken():
 
 @tokenapi.route('', methods=["GET"])
 def get_token():
-
+    randomToken = generateAccessToken()
+    expire_time = int(time.time()) + expire_seconds
     tmptoken = {
-        'token': generateAccessToken(),
+        'token': randomToken,
         'user_id': 0,
-        'expire_time': int(time.time()) + expire_seconds
+        'expire_time': expire_time
     }
     tokensdb.insert_one(tmptoken)
     access_tokens.append(tmptoken)
+    print("Token %s generated, expired when %s seconds" % (randomToken, expire_time))
     return dumps(tmptoken)
 
 @tokenapi.route('/<token>', methods=["GET"])
