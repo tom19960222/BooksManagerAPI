@@ -3,6 +3,7 @@
 from flask import Blueprint, abort, request
 from bson.json_util import dumps
 from database import usersdb
+from logger import log
 
 usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')
 
@@ -26,6 +27,8 @@ def list_all_users():
 @usersapi.route('/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     tmpusers = usersdb.find_one({'user_id': user_id})
+    if tmpusers is None:
+        abort(404)
     if len(tmpusers) == 0:
         abort(404)
     return dumps(tmpusers)
@@ -44,6 +47,10 @@ def add_user():
     if lastuser['user_id'] is not None:
         new_user_id = int(lastuser['user_id'])+1
 
+    username = jsondata['username']
+    password = jsondata['password']
+    email = jsondata['email']
+
     tmpuser = {
         'user_id': new_user_id,
         'username': jsondata['username'],
@@ -52,6 +59,7 @@ def add_user():
         'deactivated': False
     }
     usersdb.insert(tmpuser)
+    log("User %s created, username = %s, password = %s, email = %s" % (new_user_id, username, password, email))
     return dumps(tmpuser), 201
 
 
@@ -60,8 +68,8 @@ def del_user(user_id):
     tmpuser = usersdb.find_one({'user_id': user_id})
     if tmpuser is None:
         abort(404)
-
     tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'deactivated': True}})
+    log("User %s deactivated" % user_id)
     return dumps(tmpuser)
 
 
@@ -76,10 +84,13 @@ def update_user(user_id):
 
     if 'username' in jsondata and type(jsondata['username']) is unicode:
         usersdb.update({'user_id': user_id}, {'$set': {'username': jsondata['username']}})
+        log("Updated user %s's username to %s" % (user_id, jsondata['username']))
     if 'email' in jsondata and type(jsondata['email']) is unicode:
         usersdb.update({'user_id': user_id}, {'$set': {'email': jsondata['email']}})
+        log("Updated user %s's email to %s" % (user_id, jsondata['email']))
     if 'password' in jsondata and type(jsondata['password']) is unicode:
         usersdb.update({'user_id': user_id}, {'$set': {'password': jsondata['password']}})
+        log("Updated user %s's password to %s" % (user_id, jsondata['password']))
 
     tmpuser = usersdb.find_one({'user_id': user_id}) #Get updated data.
     return dumps(tmpuser)

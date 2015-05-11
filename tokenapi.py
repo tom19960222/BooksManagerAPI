@@ -3,6 +3,7 @@
 from flask import Blueprint, abort
 from bson.json_util import dumps
 from database import tokensdb
+from logger import log
 import string, random, time
 
 tokenapi = Blueprint('tokenapi', __name__, url_prefix='/api/token')
@@ -31,7 +32,7 @@ def get_token():
     }
     tokensdb.insert_one(tmptoken)
     access_tokens.append(tmptoken)
-    print("Token %s generated, expired when %s seconds" % (randomToken, expire_time))
+    log("Token %s generated, expired when %s seconds" % (randomToken, expire_time))
     return dumps(tmptoken)
 
 @tokenapi.route('/<token>', methods=["GET"])
