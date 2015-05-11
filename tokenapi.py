@@ -2,13 +2,10 @@
 # coding: UTF-8
 from flask import Blueprint, abort
 from bson.json_util import dumps
-from pymongo import MongoClient
+from database import tokensdb
 import string, random, time
 
 tokenapi = Blueprint('tokenapi', __name__, url_prefix='/api/token')
-dbClient = MongoClient('163.13.128.116', 27017)
-db = dbClient.BooksManagerTest1
-tokensdb = db.tokens
 
 access_tokens = [
     {
@@ -44,10 +41,3 @@ def get_token_by_token(token):
         if len(tmptoken) == 0:
             abort(404)
     return dumps(tmptoken)
-
-def change_token_user(token, user_id):
-    tokensdb.update({'token': token}, {'$set': {'user_id': user_id}})
-
-def get_token_expire_time(token):
-    tmptoken = tokensdb.find_one({'token': token})
-    return tmptoken['expire_time']

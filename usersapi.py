@@ -1,16 +1,10 @@
 #!/usr/bin/python
 # coding: UTF-8
-from flask import Blueprint, jsonify, abort, request
-from pymongo import MongoClient
+from flask import Blueprint, abort, request
 from bson.json_util import dumps
-import tokenapi
-import time
+from database import usersdb
 
 usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')
-dbClient = MongoClient('163.13.128.116', 27017)
-db = dbClient.BooksManagerTest1
-usersdb = db.users
-tokensdb = db.tokens
 
 users = [
     {
@@ -89,31 +83,3 @@ def update_user(user_id):
 
     tmpuser = usersdb.find_one({'user_id': user_id}) #Get updated data.
     return dumps(tmpuser)
-
-@usersapi.route('/login', methods=['POST'])
-def login():
-    jsondata = request.get_json()
-    if not jsondata:
-        abort(400)
-    username = jsondata['username']
-    password = jsondata['password']
-    token = request.headers.get('Token')
-    if username is None or password is None or token is None:
-        abort(400)
-    if time.time() > tokenapi.get_token_expire_time(token):
-        abort(403), "Token expired."
-    tmpuser = usersdb.find_one({'username': username})
-    if tmpuser is None: #Can't find the user.
-        abort(404)
-    if tmpuser['password'] == password:
-        tokenapi.change_token_user(token, tmpuser['user_id'])
-        return jsonify({'message': "Login successful"})
-    else:
-        return jsonify({'message': "Login failed"})
-
-
-#@usersapi.route('/with_token/<token>', methods=['GET'])
-def get_user_id_by_token(token):
-    tmptoken = tokensdb.find_one({'token': token})
-    return tmptoken['user_id']
-#    return jsonify({"user_id": tmptoken['user_id']})

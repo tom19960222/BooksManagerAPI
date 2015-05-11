@@ -3,12 +3,10 @@
 from flask import Blueprint, jsonify, abort, request
 from pymongo import MongoClient
 from bson.json_util import dumps
-import usersapi
+from userutils import get_user_id_by_token
+from database import booksdb
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
-dbClient = MongoClient('163.13.128.116', 27017)
-db = dbClient.BooksManagerTest1
-booksdb = db.books
 
 books = [
     {
@@ -26,15 +24,14 @@ books = [
 @booksapi.route('', methods=['GET'])
 def list_all_books():
     reqtoken = request.headers.get('Token')
-    tmpuserid = usersapi.get_user_id_by_token(reqtoken)
+    tmpuserid = get_user_id_by_token(reqtoken)
     tmpbooks = booksdb.find({'owned_user': {'$in': [tmpuserid]}})
     return dumps(tmpbooks)
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
-    #tmpbooks = [tmpbook for tmpbook in books if tmpbook['book_id'] == book_id]
     reqtoken = request.headers.get('Token')
-    tmpuserid = usersapi.get_user_id_by_token(reqtoken)
+    tmpuserid = get_user_id_by_token(reqtoken)
     tmpbooks = booksdb.find({'$and': [{'owned_user': {'$in': [tmpuserid]}}, {'book_id': book_id}]})
     return dumps(tmpbooks)
 
