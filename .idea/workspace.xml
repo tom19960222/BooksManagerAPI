@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="69ec026e-0f6b-4a52-be40-1b3478122569" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/jsonresponse.py" afterPath="$PROJECT_DIR$/views/jsonresponse.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controllers/tokenapi.py" afterPath="$PROJECT_DIR$/controllers/tokenapi.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/tokens.py" afterPath="$PROJECT_DIR$/models/tokens.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/utils/tokenutils.py" afterPath="$PROJECT_DIR$/models/utils/tokenutils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/users.py" afterPath="$PROJECT_DIR$/models/users.py" />
-    </list>
+    <list default="true" id="69ec026e-0f6b-4a52-be40-1b3478122569" name="Default" comment="" />
     <ignored path="BooksManagerAPI.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
