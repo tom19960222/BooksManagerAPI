@@ -1,11 +1,11 @@
 # coding=utf-8
 from flask import Flask
 
-from booksapi import booksapi
-from controllers import tagsapi
-from usersapi import usersapi
-from tokenapi import tokenapi
-from loginapi import loginapi
+from controllers.booksapi import booksapi
+from controllers.tagsapi import tagsapi
+from controllers.usersapi import usersapi
+from controllers.tokenapi import tokenapi
+from controllers.loginapi import loginapi
 
 
 app = Flask(__name__)
