@@ -12,8 +12,8 @@ class JSONResponse:
 
     def makeJSONResponse(self):
         if type(self.response_message) is dict:
-            return str(dumps(self.response_message))
-        return str(self.response_message)
+            return dumps(self.response_message)
+        return self.response_message
 
     def __str__(self):
         return "%s: %s" % (self.response_code, self.response_message)

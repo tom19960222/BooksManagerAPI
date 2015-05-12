@@ -2,7 +2,7 @@ import time
 
 from flask import Blueprint, abort, request, jsonify
 
-from models.utils.tokenutils import get_token_expire_time, change_token_user
+from models.utils.tokenutils import getTokenExpireTime, changeTokenUser
 
 #!/usr/bin/python
 # coding: UTF-8
@@ -87,7 +87,7 @@ def update_user(user_id, username, password, email):
 
 def login(username, password, token):
     print ("user %s is logging in, password = %s, token = %s" % (username, password, token))
-    if time.time() > get_token_expire_time(token):
+    if time.time() > getTokenExpireTime(token):
         log("token %s expired" % (token))
         return JSONResponse(jsonify({'message': "Token expired"}), 403)
     tmpuser = usersdb.find_one({'username': username})
@@ -95,7 +95,7 @@ def login(username, password, token):
         print("User %s not found." % (username))
         return JSONResponse(jsonify({'message': "User not found"}), 404)
     if tmpuser['password'] == password:
-        change_token_user(token, tmpuser['user_id'])
+        changeTokenUser(token, tmpuser['user_id'])
         log("User %s logged in with token %s"% (username, token))
         return JSONResponse(jsonify({'message': "Login successful"}))
     else:
