@@ -1,10 +1,15 @@
 #!/usr/bin/python
 # coding: UTF-8
+import string
+import random
+import time
+
 from flask import Blueprint, abort
 from bson.json_util import dumps
-from database import tokensdb
-from logger import log
-import string, random, time
+
+from models.database import tokensdb
+from models.logger import log
+
 
 tokenapi = Blueprint('tokenapi', __name__, url_prefix='/api/token')
 

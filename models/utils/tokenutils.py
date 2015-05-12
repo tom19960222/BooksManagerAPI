@@ -1,4 +1,4 @@
-from database import tokensdb
+from models.database import tokensdb
 
 
 def change_token_user(token, user_id):

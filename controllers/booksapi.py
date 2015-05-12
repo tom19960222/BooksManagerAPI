@@ -1,10 +1,11 @@
 #!/usr/bin/python
 #coding: UTF-8
 from flask import Blueprint, jsonify, abort, request
-from pymongo import MongoClient
 from bson.json_util import dumps
-from userutils import get_user_id_by_token
-from database import booksdb
+
+from models.utils.userutils import get_user_id_by_token
+from models.database import booksdb
+
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
 

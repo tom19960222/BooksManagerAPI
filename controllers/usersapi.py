@@ -2,8 +2,10 @@
 # coding: UTF-8
 from flask import Blueprint, abort, request
 from bson.json_util import dumps
-from database import usersdb
-from logger import log
+
+from models.database import usersdb
+from models.logger import log
+
 
 usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')
 

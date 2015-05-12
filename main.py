@@ -1,10 +1,12 @@
 # coding=utf-8
 from flask import Flask
+
 from booksapi import booksapi
-from tagsapi import tagsapi
+from controllers import tagsapi
 from usersapi import usersapi
 from tokenapi import tokenapi
 from loginapi import loginapi
+
 
 app = Flask(__name__)
 app.register_blueprint(booksapi)
