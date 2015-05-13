@@ -2,23 +2,23 @@
 #coding: UTF-8
 from flask import Blueprint, jsonify, abort, request
 from bson.json_util import dumps
-
 from models.utils.userutils import get_user_id_by_token
 from models.database import booksdb
+from models.logger import log
 
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
 
 books = [
     {
-        'book_id' : 0,
-        'bookname' : u'雨港基隆 - 桐花雨',
-        'author' : u'東方紅',
-        'publisher' : u'尖端出版',
-        'publish_date' : '20150101',
-        'price' : 200,
-        'ISBN' : '1234567890',
-        'owned_user': [1,2]
+        'book_id': 0,
+        'bookname': u'雨港基隆 - 桐花雨',
+        'author': u'東方紅',
+        'publisher': u'尖端出版',
+        'publish_date': '20150101',
+        'price': 200,
+        'ISBN': '1234567890',
+        'user_id': 1
     }
 ]
 
@@ -26,59 +26,141 @@ books = [
 def list_all_books():
     reqtoken = request.headers.get('Token')
     tmpuserid = get_user_id_by_token(reqtoken)
-    tmpbooks = booksdb.find({'owned_user': {'$in': [tmpuserid]}})
+    if tmpuserid == 0:
+        abort(401)
+    tmpbooks = booksdb.find({'$and': [{'user_id': tmpuserid}, {'deleted': False}]})
     return dumps(tmpbooks)
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
     reqtoken = request.headers.get('Token')
     tmpuserid = get_user_id_by_token(reqtoken)
-    tmpbooks = booksdb.find({'$and': [{'owned_user': {'$in': [tmpuserid]}}, {'book_id': book_id}]})
+    if tmpuserid == 0:
+        abort(401)
+    tmpbooks = booksdb.find({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
     return dumps(tmpbooks)
 
 @booksapi.route('', methods=['POST'])
 def add_book():
-    if not request.json or not 'bookname' in request.json:
+    if not request.headers.get('Token'):
         abort(400)
+    if get_user_id_by_token(request.headers.get('Token')) == 0:
+        abort(403) # User not login is not allow to add books.
+
+    jsondata = request.get_json()
+
+    if not jsondata:
+        abort(400)
+    if 'bookname' not in jsondata:
+        abort(400)
+
+    new_book_id = 1
     tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
     for book in tmpbooks:
         lastbook = book
-    new_user_id = 1
     if lastbook['user_id'] is not None:
-        new_user_id = int(lastbook['book_id'])+1
+        new_book_id = int(lastbook['book_id'])+1
+
+    bookname = ""
+    author = ""
+    publisher = ""
+    publish_date = ""
+    price = ""
+    ISBN = ""
+
+    if 'bookname' in jsondata:
+        bookname = jsondata['bookname']
+    if 'author' in jsondata:
+        author = jsondata['author']
+    if 'publisher' in jsondata:
+        publisher = jsondata['publisher']
+    if 'publish_date' in jsondata:
+        publish_date = jsondata['publish_date']
+    if 'price' in jsondata:
+        price = jsondata['price']
+    if 'ISBN' in jsondata:
+        ISBN = jsondata['ISBN']
+    user_id = get_user_id_by_token(request.headers.get('Token'))
 
     tmpbook = {
-        'book_id' : books[-1]['book_id']+1,
-        'bookname' : request.json['bookname']
+        'book_id' : new_book_id,
+        'bookname' : bookname,
+        'author': author,
+        'publisher': publisher,
+        'publish_date': publish_date,
+        'price': price,
+        'ISBN': ISBN,
+        'user_id': user_id,
+        'deleted': False
     }
-    books.append(tmpbook)
-    return jsonify({'book':tmpbook}), 201
+
+    booksdb.insert(tmpbook)
+    print("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\"" \
+          % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN))
+    return dumps(tmpbook), 201
 
 @booksapi.route('/<int:book_id>', methods=['DELETE'])
 def del_book(book_id):
-    tmpbook = [tmpbook for tmpbook in books if tmpbook['book_id'] == book_id]
+    if not request.headers.get('Token'):
+        abort(400)
+    if get_user_id_by_token(request.headers.get('Token')) == 0:
+        abort(403) # User not login is not allow to delete books.
+    tmpuserid = get_user_id_by_token(request.headers.get('Token'))
+    tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
     if len(tmpbook) == 0:
         abort(404)
-    books.remove(tmpbook[0])
-    return jsonify({'result':True})
+    booksdb.update({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
+    print("User %s deleted book %s" % (tmpuserid, book_id))
+    return jsonify({'message': 'Book %s deleted successful.' % (book_id)})
 
 @booksapi.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
-    tmpbook = [tmpbook for tmpbook in books if tmpbook['book_id'] == book_id]
+    tmpuserid = get_user_id_by_token(request.headers.get('Token'))
+    tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
     jsondata = request.get_json()
     if len(tmpbook) == 0:
         abort(404)
     if not jsondata:
         abort(400)
 
-    if 'bookname' in request.json and type(request.json['bookname']) is unicode:
-        tmpbook[0]['bookname'] = jsondata['bookname']
-    if 'author' in request.json and type(request.json['author']) is unicode:
-        tmpbook[0]['author'] = jsondata['author']
-    if 'publisher' in request.json and type(request.json['publisher']) is unicode:
-        tmpbook[0]['publisher'] = jsondata['publisher']
-    if 'publish_date' in request.json and type(request.json['publish_date']) is unicode:
-        tmpbook[0]['publish_date'] = jsondata['publish_date']
-    if jsondata.get('price') is not None and type(jsondata['price']) is int:
-        books[0]['price'] = jsondata['price']
-        return jsonify({'book': tmpbook[0]})
+    bookname = ""
+    author = ""
+    publisher = ""
+    publish_date = ""
+    price = ""
+    ISBN = ""
+
+    if 'bookname' in jsondata:
+        bookname = jsondata['bookname']
+    if 'author' in jsondata:
+        author = jsondata['author']
+    if 'publisher' in jsondata:
+        publisher = jsondata['publisher']
+    if 'publish_date' in jsondata:
+        publish_date = jsondata['publish_date']
+    if 'price' in jsondata:
+        price = jsondata['price']
+    if 'ISBN' in jsondata:
+        ISBN = jsondata['ISBN']
+
+    if bookname != "":
+        booksdb.update({'user_id': tmpuserid}, {'$set': {'bookname': bookname}})
+        log("Updated user %s's book %s's bookname to %s" % (tmpuserid, book_id, bookname))
+    if author != "":
+        booksdb.update({'user_id': tmpuserid}, {'$set': {'author': author}})
+        log("Updated user %s's book %s's author to %s" % (tmpuserid, book_id, author))
+    if publisher != "":
+        booksdb.update({'user_id': tmpuserid}, {'$set': {'publisher': publisher}})
+        log("Updated user %s's book %s's publisher to %s" % (tmpuserid, book_id, publisher))
+    if publish_date != "":
+        booksdb.update({'user_id': tmpuserid}, {'$set': {'publish_date': publish_date}})
+        log("Updated user %s's book %s's publish_date to %s" % (tmpuserid, book_id, publish_date))
+    if price != "":
+        booksdb.update({'user_id': tmpuserid}, {'$set': {'price': price}})
+        log("Updated user %s's book %s's price to %s" % (tmpuserid, book_id, price))
+    if ISBN != "":
+        booksdb.update({'user_id': tmpuserid}, {'$set': {'ISBN': ISBN}})
+        log("Updated user %s's book %s's ISBN to %s" % (tmpuserid, book_id, ISBN))
+
+    tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
+    return dumps(tmpbook)
