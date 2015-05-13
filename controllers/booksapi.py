@@ -1,11 +1,9 @@
 #!/usr/bin/python
 #coding: UTF-8
-from flask import Blueprint, jsonify, abort, request
-from bson.json_util import dumps
+from flask import Blueprint, abort, request
 from models.utils.userutils import get_user_id_by_token
 from models.database import booksdb
-from models.logger import log
-
+import models.books
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
 
@@ -28,8 +26,8 @@ def list_all_books():
     tmpuserid = get_user_id_by_token(reqtoken)
     if tmpuserid == 0:
         abort(401)
-    tmpbooks = booksdb.find({'$and': [{'user_id': tmpuserid}, {'deleted': False}]})
-    return dumps(tmpbooks)
+    response = models.books.list_all_books(tmpuserid)
+    return response.response_message, response.response_code
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
@@ -37,8 +35,8 @@ def get_book_by_id(book_id):
     tmpuserid = get_user_id_by_token(reqtoken)
     if tmpuserid == 0:
         abort(401)
-    tmpbooks = booksdb.find({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
-    return dumps(tmpbooks)
+    response = models.books.get_book_by_id(tmpuserid,book_id)
+    return response.response_message, response.response_code
 
 @booksapi.route('', methods=['POST'])
 def add_book():
@@ -46,20 +44,11 @@ def add_book():
         abort(400)
     if get_user_id_by_token(request.headers.get('Token')) == 0:
         abort(403) # User not login is not allow to add books.
-
     jsondata = request.get_json()
-
     if not jsondata:
         abort(400)
     if 'bookname' not in jsondata:
         abort(400)
-
-    new_book_id = 1
-    tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
-    for book in tmpbooks:
-        lastbook = book
-    if lastbook['user_id'] is not None:
-        new_book_id = int(lastbook['book_id'])+1
 
     bookname = ""
     author = ""
@@ -82,22 +71,9 @@ def add_book():
         ISBN = jsondata['ISBN']
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
-    tmpbook = {
-        'book_id' : new_book_id,
-        'bookname' : bookname,
-        'author': author,
-        'publisher': publisher,
-        'publish_date': publish_date,
-        'price': price,
-        'ISBN': ISBN,
-        'user_id': user_id,
-        'deleted': False
-    }
+    response = models.books.add_book(user_id, bookname, author, publisher, publish_date, price, ISBN)
+    return response.response_message, response.response_code
 
-    booksdb.insert(tmpbook)
-    print("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\"" \
-          % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN))
-    return dumps(tmpbook), 201
 
 @booksapi.route('/<int:book_id>', methods=['DELETE'])
 def del_book(book_id):
@@ -109,9 +85,8 @@ def del_book(book_id):
     tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
     if len(tmpbook) == 0:
         abort(404)
-    booksdb.update({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
-    print("User %s deleted book %s" % (tmpuserid, book_id))
-    return jsonify({'message': 'Book %s deleted successful.' % (book_id)})
+    response = models.books.del_book(tmpuserid, book_id)
+    return response.response_message, response.response_code
 
 @booksapi.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
@@ -143,24 +118,5 @@ def update_book(book_id):
     if 'ISBN' in jsondata:
         ISBN = jsondata['ISBN']
 
-    if bookname != "":
-        booksdb.update({'user_id': tmpuserid}, {'$set': {'bookname': bookname}})
-        log("Updated user %s's book %s's bookname to %s" % (tmpuserid, book_id, bookname))
-    if author != "":
-        booksdb.update({'user_id': tmpuserid}, {'$set': {'author': author}})
-        log("Updated user %s's book %s's author to %s" % (tmpuserid, book_id, author))
-    if publisher != "":
-        booksdb.update({'user_id': tmpuserid}, {'$set': {'publisher': publisher}})
-        log("Updated user %s's book %s's publisher to %s" % (tmpuserid, book_id, publisher))
-    if publish_date != "":
-        booksdb.update({'user_id': tmpuserid}, {'$set': {'publish_date': publish_date}})
-        log("Updated user %s's book %s's publish_date to %s" % (tmpuserid, book_id, publish_date))
-    if price != "":
-        booksdb.update({'user_id': tmpuserid}, {'$set': {'price': price}})
-        log("Updated user %s's book %s's price to %s" % (tmpuserid, book_id, price))
-    if ISBN != "":
-        booksdb.update({'user_id': tmpuserid}, {'$set': {'ISBN': ISBN}})
-        log("Updated user %s's book %s's ISBN to %s" % (tmpuserid, book_id, ISBN))
-
-    tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
-    return dumps(tmpbook)
+    response = models.books.update_book(tmpuserid, book_id, bookname, author, publisher, publish_date, price, ISBN)
+    return response.response_message, response.response_code
