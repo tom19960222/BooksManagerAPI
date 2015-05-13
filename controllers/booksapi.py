@@ -26,7 +26,7 @@ books = [
 def list_all_books():
     reqtoken = request.headers.get('Token')
     if not checkIsVaildUserWithToken(reqtoken):
-        abort(401)
+        return JSONResponse(jsonify({'message': 'Please log in first.'}), 401)
     response = models.books.list_all_books(get_user_id_by_token(reqtoken))
     return response.response_message, response.response_code
 
@@ -34,7 +34,7 @@ def list_all_books():
 def get_book_by_id(book_id):
     reqtoken = request.headers.get('Token')
     if not checkIsVaildUserWithToken(reqtoken):
-        abort(401)
+        return JSONResponse(jsonify({'message': 'Please log in first.'}), 401)
     response = models.books.get_book_by_id(get_user_id_by_token(reqtoken), book_id)
     return response.response_message, response.response_code
 
@@ -42,14 +42,14 @@ def get_book_by_id(book_id):
 def add_book():
     token = request.headers.get('Token')
     if not token:
-        return JSONResponse()
+        return JSONResponse(jsonify({'message': 'Please provide token.'}), 401)
     if not checkIsVaildUserWithToken(token):
-        abort(403) # User not login is not allow to add books.
+        return JSONResponse(jsonify({'message': 'Please login first.'}), 403) # User not login is not allow to add books.
     jsondata = request.get_json()
     if not jsondata:
-        abort(400)
+        return JSONResponse(jsonify({'message': 'Invaild JSON request.'}), 400)
     if 'bookname' not in jsondata:
-        abort(400)
+        return JSONResponse(jsonify({'message': 'Please provide at least book name.'}), 400)
 
     bookname = ""
     author = ""
@@ -78,26 +78,21 @@ def add_book():
 
 @booksapi.route('/<int:book_id>', methods=['DELETE'])
 def del_book(book_id):
-    if not request.headers.get('Token'):
-        abort(400)
+    token = request.headers.get('Token')
+    if not token:
+        return JSONResponse(jsonify({'message': 'Please provide token.'}), 401)
     if get_user_id_by_token(request.headers.get('Token')) == 0:
-        abort(403) # User not login is not allow to delete books.
-    tmpuserid = get_user_id_by_token(request.headers.get('Token'))
-    tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
-    if len(tmpbook) == 0:
-        abort(404)
+        return JSONResponse(jsonify({'message': 'Please login first.'}), 403) # User not login is not allow to delete books.
+    tmpuserid = get_user_id_by_token(token)
     response = models.books.del_book(tmpuserid, book_id)
     return response.response_message, response.response_code
 
 @booksapi.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
     tmpuserid = get_user_id_by_token(request.headers.get('Token'))
-    tmpbook = booksdb.find_one({'$and': [{'user_id': tmpuserid}, {'book_id': book_id}]})
     jsondata = request.get_json()
-    if len(tmpbook) == 0:
-        abort(404)
     if not jsondata:
-        abort(400)
+        return JSONResponse(jsonify({'message': 'Invaild JSON request.'}), 400)
 
     bookname = ""
     author = ""

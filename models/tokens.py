@@ -28,7 +28,7 @@ def get_new_token():
     log("Token %s generated, expired when %s seconds" % (randomToken, expire_time))
     return JSONResponse(dumps(tmptoken), 201)
 
-def get_token_by_token(token):
+def getTokenInfoByToken(token):
     if token == "ALL":
         tmptoken = tokensdb.find()
     else:

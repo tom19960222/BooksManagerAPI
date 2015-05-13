@@ -12,5 +12,5 @@ def get_new_token():
 
 @tokenapi.route('/<token>', methods=["GET"])
 def get_token_by_token(token):
-    response = models.tokens.get_token_by_token(token)
+    response = models.tokens.getTokenInfoByToken(token)
     return response.response_message, response.response_code

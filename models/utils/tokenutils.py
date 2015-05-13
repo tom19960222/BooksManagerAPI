@@ -12,3 +12,9 @@ def getTokenExpireTime(token):
 
 def generateAccessToken():
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+
+def isValidToken(token):
+    tmptoken = tokensdb.find_one({'token': token})
+    if len(tmptoken) == 0:
+        return False
+    return True
