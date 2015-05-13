@@ -1,10 +1,13 @@
+import time
+
+from bson.json_util import dumps
+from flask import jsonify
+
 from utils.tokenutils import generateAccessToken
 from models.database import tokensdb
 from models.logger import log
-from bson.json_util import dumps
-from views.jsonresponse import JSONResponse
-from flask import jsonify
-import time
+from views.templates.jsonresponse import JSONResponse
+
 
 access_tokens = [
     {

@@ -1,17 +1,17 @@
 import time
 
-from flask import Blueprint, abort, request, jsonify
+from flask import jsonify
 
 from models.utils.tokenutils import getTokenExpireTime, changeTokenUser
 
 #!/usr/bin/python
 # coding: UTF-8
-from flask import Blueprint, abort, request
+from flask import abort, request
 from bson.json_util import dumps
 
 from models.database import usersdb
 from models.logger import log
-from views.jsonresponse import JSONResponse
+from views.templates.jsonresponse import JSONResponse
 
 users = [
     {

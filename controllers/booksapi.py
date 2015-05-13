@@ -1,11 +1,12 @@
 #!/usr/bin/python
 #coding: UTF-8
-from flask import Blueprint, abort, request
-from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
-from models.database import booksdb
+from flask import Blueprint, request
 from flask import jsonify
-from views.jsonresponse import JSONResponse
+
+from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
+from views.templates.jsonresponse import JSONResponse
 import models.books
+
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
 
