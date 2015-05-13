@@ -1,8 +1,10 @@
 #!/usr/bin/python
 #coding: UTF-8
 from flask import Blueprint, abort, request
-from models.utils.userutils import get_user_id_by_token
+from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
 from models.database import booksdb
+from flask import jsonify
+from views.jsonresponse import JSONResponse
 import models.books
 
 booksapi = Blueprint('booksapi', __name__, url_prefix='/api/book')
@@ -23,26 +25,25 @@ books = [
 @booksapi.route('', methods=['GET'])
 def list_all_books():
     reqtoken = request.headers.get('Token')
-    tmpuserid = get_user_id_by_token(reqtoken)
-    if tmpuserid == 0:
+    if not checkIsVaildUserWithToken(reqtoken):
         abort(401)
-    response = models.books.list_all_books(tmpuserid)
+    response = models.books.list_all_books(get_user_id_by_token(reqtoken))
     return response.response_message, response.response_code
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
     reqtoken = request.headers.get('Token')
-    tmpuserid = get_user_id_by_token(reqtoken)
-    if tmpuserid == 0:
+    if not checkIsVaildUserWithToken(reqtoken):
         abort(401)
-    response = models.books.get_book_by_id(tmpuserid,book_id)
+    response = models.books.get_book_by_id(get_user_id_by_token(reqtoken), book_id)
     return response.response_message, response.response_code
 
 @booksapi.route('', methods=['POST'])
 def add_book():
-    if not request.headers.get('Token'):
-        abort(400)
-    if get_user_id_by_token(request.headers.get('Token')) == 0:
+    token = request.headers.get('Token')
+    if not token:
+        return JSONResponse()
+    if not checkIsVaildUserWithToken(token):
         abort(403) # User not login is not allow to add books.
     jsondata = request.get_json()
     if not jsondata:

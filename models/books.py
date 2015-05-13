@@ -1,10 +1,11 @@
 #!/usr/bin/python
 #coding: UTF-8
-from flask import jsonify, abort
+from flask import jsonify
 from bson.json_util import dumps
 from models.logger import log
 from database import booksdb
 from views.jsonresponse import JSONResponse
+from utils.bookutils import isBookExist
 
 books = [
     {
@@ -24,6 +25,8 @@ def list_all_books(user_id):
     return JSONResponse(dumps(tmpbooks))
 
 def get_book_by_id(user_id, book_id):
+    if not isBookExist(user_id, book_id):
+        return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
     return JSONResponse(dumps(tmpbooks))
 
@@ -53,17 +56,15 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
     return JSONResponse(dumps(tmpbook), 201)
 
 def del_book(user_id, book_id):
-    tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
-    if len(tmpbook) == 0:
+    if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
     print("User %s deleted book %s" % (user_id, book_id))
     return JSONResponse(jsonify({'message': "Book %s deleted successful." % (book_id)}))
 
 def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN=""):
-    tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
-    if len(tmpbook) == 0:
-        abort(404)
+    if not isBookExist(user_id, book_id):
+        return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     if bookname != "":
         booksdb.update({'user_id': user_id}, {'$set': {'bookname': bookname}})
         log("Updated user %s's book %s's bookname to %s" % (user_id, book_id, bookname))
@@ -83,5 +84,5 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
         booksdb.update({'user_id': user_id}, {'$set': {'ISBN': ISBN}})
         log("Updated user %s's book %s's ISBN to %s" % (user_id, book_id, ISBN))
 
-    tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
+    tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]}) # Get updated data.
     return JSONResponse(dumps(tmpbook))

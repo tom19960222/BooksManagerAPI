@@ -4,7 +4,6 @@ from flask import Blueprint, abort, request
 from models.database import usersdb
 import models.users
 
-
 usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')
 
 @usersapi.route('', methods=['GET'])
@@ -12,12 +11,10 @@ def list_all_users():
     response = models.users.list_all_users()
     return response.response_message, response.response_code
 
-
 @usersapi.route('/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     response = models.users.get_user_by_id(user_id)
     return response.response_message, response.response_code
-
 
 @usersapi.route('', methods=['POST'])
 def add_user():
@@ -31,13 +28,10 @@ def add_user():
     response = models.users.add_user(username,password,email)
     return response.response_message, response.response_code
 
-
-
 @usersapi.route('/<int:user_id>', methods=['DELETE'])
 def del_user(user_id):
     response = models.users.del_user(user_id)
     return response.response_message, response.response_code
-
 
 @usersapi.route('/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
