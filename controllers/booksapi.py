@@ -4,6 +4,7 @@ from flask import Blueprint, request
 
 from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
 from views.JSONResponse.CommonJSONResponse import *
+from views.templates.JSONResponse import makeResponse
 import models.books
 
 
@@ -26,7 +27,7 @@ books = [
 def list_all_books():
     reqtoken = request.headers.get('Token')
     if not checkIsVaildUserWithToken(reqtoken):
-        return JSONResponseLoginFirst
+        return makeResponse(JSONResponseLoginFirst)
     response = models.books.list_all_books(get_user_id_by_token(reqtoken))
     return response.response_message, response.response_code
 
@@ -34,7 +35,7 @@ def list_all_books():
 def get_book_by_id(book_id):
     reqtoken = request.headers.get('Token')
     if not checkIsVaildUserWithToken(reqtoken):
-        return JSONResponseLoginFirst
+        return makeResponse(JSONResponseLoginFirst)
     response = models.books.get_book_by_id(get_user_id_by_token(reqtoken), book_id)
     return response.response_message, response.response_code
 
@@ -42,14 +43,14 @@ def get_book_by_id(book_id):
 def add_book():
     token = request.headers.get('Token')
     if not token:
-        return JSONResponseProvideToken
+        return makeResponse(JSONResponseProvideToken)
     if not checkIsVaildUserWithToken(token):
-        return JSONResponseLoginFirst
+        return makeResponse(JSONResponseLoginFirst)
     jsondata = request.get_json()
     if not jsondata:
-        return JSONResponseInvalidJSON
+        return makeResponse(JSONResponseInvalidJSON)
     if 'bookname' not in jsondata:
-        return JSONResponse(jsonify({'message': 'Please provide at least book name.'}), 400)
+        return makeResponse(JSONResponse(jsonify({'message': 'Please provide at least book name.'}), 400))
 
     bookname = ""
     author = ""
@@ -80,9 +81,9 @@ def add_book():
 def del_book(book_id):
     token = request.headers.get('Token')
     if not token:
-        return JSONResponseProvideToken
+        return makeResponse(JSONResponseProvideToken)
     if get_user_id_by_token(request.headers.get('Token')) == 0:
-        return JSONResponseLoginFirst # User not login is not allow to delete books.
+        return makeResponse(JSONResponseLoginFirst) # User not login is not allow to delete books.
     tmpuserid = get_user_id_by_token(token)
     response = models.books.del_book(tmpuserid, book_id)
     return response.response_message, response.response_code
@@ -92,7 +93,7 @@ def update_book(book_id):
     tmpuserid = get_user_id_by_token(request.headers.get('Token'))
     jsondata = request.get_json()
     if not jsondata:
-        return JSONResponseInvalidJSON
+        return makeResponse(JSONResponseInvalidJSON)
 
     bookname = ""
     author = ""

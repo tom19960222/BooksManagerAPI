@@ -1,5 +1,5 @@
 from views.templates.JSONResponse import JSONResponse
-from flask import jsonify
+from json import dumps as jsonify
 
 JSONResponseLoginFirst = JSONResponse(jsonify({'message': 'Please log in first.'}), 401)
 JSONResponseProvideToken = JSONResponse(jsonify({'message': 'Please provide token.'}), 401)

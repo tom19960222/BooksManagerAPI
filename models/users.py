@@ -11,10 +11,11 @@ from bson.json_util import dumps
 
 from models.database import usersdb
 from models.logger import log
-from views.templates.JSONResponse import JSONResponse
+from views.templates.JSONResponse import JSONResponse, makeResponse
 from views.JSONResponse.UserJSONResponse import *
 from views.JSONResponse.TokenJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *
+from views.JSONResponse.CommonJSONResponse import *
 
 users = [
     {
@@ -34,10 +35,10 @@ def list_all_users():
 def get_user_by_id(user_id):
     tmpusers = usersdb.find_one({'user_id': user_id})
     if tmpusers is None:
-        abort(404)
+        return JSONResponseUserNotFound
     if len(tmpusers) == 0:
-        abort(404)
-    return JSONResponse(response_dict_or_string=dumps(tmpusers))
+        return JSONResponseUserNotFound
+    return JSONResponse(dumps(tmpusers))
 
 def add_user(username, password, email):
     tmpusers = usersdb.find().sort([('user_id', -1)]).limit(1)
@@ -57,7 +58,7 @@ def add_user(username, password, email):
 
     usersdb.insert(tmpuser)
     log("User %s created, username = %s, password = %s, email = %s" % (new_user_id, username, password, email))
-    return JSONResponse(response_dict_or_string=dumps(tmpuser))
+    return JSONResponse(dumps(tmpuser))
 
 def del_user(user_id):
     tmpuser = usersdb.find_one({'user_id': user_id})
@@ -65,15 +66,15 @@ def del_user(user_id):
         abort(404)
     tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'deactivated': True}})
     log("User %s deactivated" % user_id)
-    return JSONResponse(response_dict_or_string=dumps(tmpuser))
+    return JSONResponse(dumps(tmpuser))
 
 def update_user(user_id, username, password, email):
     tmpuser = usersdb.find_one({'user_id': user_id})
     jsondata = request.get_json()
     if tmpuser is None:
-        abort(404)
+        JSONResponseUserNotFound
     if not jsondata:
-        abort(400)
+        JSONResponseInvalidJSON
 
     if type(jsondata['username']) is unicode:
         usersdb.update({'user_id': user_id}, {'$set': {'username': username}})

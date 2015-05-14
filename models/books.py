@@ -5,7 +5,7 @@ from bson.json_util import dumps
 
 from models.logger import log
 from database import booksdb
-from views.templates.JSONResponse import JSONResponse
+from views.templates.JSONResponse import JSONResponse, makeResponse
 from utils.bookutils import isBookExist
 
 
@@ -69,22 +69,22 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     if bookname != "":
-        booksdb.update({'user_id': user_id}, {'$set': {'bookname': bookname}})
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'bookname': bookname}})
         log("Updated user %s's book %s's bookname to %s" % (user_id, book_id, bookname))
     if author != "":
-        booksdb.update({'user_id': user_id}, {'$set': {'author': author}})
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'author': author}})
         log("Updated user %s's book %s's author to %s" % (user_id, book_id, author))
     if publisher != "":
-        booksdb.update({'user_id': user_id}, {'$set': {'publisher': publisher}})
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'publisher': publisher}})
         log("Updated user %s's book %s's publisher to %s" % (user_id, book_id, publisher))
     if publish_date != "":
-        booksdb.update({'user_id': user_id}, {'$set': {'publish_date': publish_date}})
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'publish_date': publish_date}})
         log("Updated user %s's book %s's publish_date to %s" % (user_id, book_id, publish_date))
     if price != "":
-        booksdb.update({'user_id': user_id}, {'$set': {'price': price}})
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'price': price}})
         log("Updated user %s's book %s's price to %s" % (user_id, book_id, price))
     if ISBN != "":
-        booksdb.update({'user_id': user_id}, {'$set': {'ISBN': ISBN}})
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'ISBN': ISBN}})
         log("Updated user %s's book %s's ISBN to %s" % (user_id, book_id, ISBN))
 
     tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]}) # Get updated data.

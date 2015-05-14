@@ -1,5 +1,7 @@
-from flask import jsonify
 from bson.json_util import dumps
+
+def makeResponse(JSONResponse):
+    return JSONResponse.response_message, JSONResponse.response_code
 
 class JSONResponse:
     def __init__(self, response_dict_or_string="", response_code=200):
