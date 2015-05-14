@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding: UTF-8
-from flask import Blueprint, abort, request
+from flask import Blueprint, request
 from models.database import usersdb
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.UserJSONResponse import *

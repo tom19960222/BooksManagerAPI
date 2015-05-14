@@ -7,7 +7,7 @@ from utils.tokenutils import generateAccessToken
 from models.database import tokensdb
 from models.logger import log
 from views.templates.JSONResponse import JSONResponse, makeResponse
-
+from views.JSONResponse.TokenJSONResponse import *
 
 access_tokens = [
     {
@@ -37,5 +37,5 @@ def getTokenInfoByToken(token):
     else:
         tmptoken = tokensdb.find_one({'token': token})
         if len(tmptoken) == 0:
-            return JSONResponse(jsonify({'message': "Token not found."}), 404)
+            return makeResponse(JSONResponseTokenNotFound)
     return JSONResponse(dumps(tmptoken))
