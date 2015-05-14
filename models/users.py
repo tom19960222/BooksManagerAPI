@@ -11,7 +11,10 @@ from bson.json_util import dumps
 
 from models.database import usersdb
 from models.logger import log
-from views.templates.jsonresponse import JSONResponse
+from views.templates.JSONResponse import JSONResponse
+from views.JSONResponse.UserJSONResponse import *
+from views.JSONResponse.TokenJSONResponse import *
+from views.JSONResponse.LoginJSONResponse import *
 
 users = [
     {
@@ -89,15 +92,15 @@ def login(username, password, token):
     print ("user %s is logging in, password = %s, token = %s" % (username, password, token))
     if time.time() > getTokenExpireTime(token):
         log("token %s expired" % (token))
-        return JSONResponse(jsonify({'message': "Token expired"}), 403)
+        return JSONREsponseTokenExpired
     tmpuser = usersdb.find_one({'username': username})
     if tmpuser is None:
         print("User %s not found." % (username))
-        return JSONResponse(jsonify({'message': "User not found"}), 404)
+        return JSONResponseUserNotFound
     if tmpuser['password'] == password:
         changeTokenUser(token, tmpuser['user_id'])
         log("User %s logged in with token %s"% (username, token))
-        return JSONResponse(jsonify({'message': "Login successful"}))
+        return JSONResponseLoginSuccessful
     else:
         log("User %s logged in with wrong password")
-        return JSONResponse(jsonify({'message': "Wrong password."}), 403)
+        return JSONResponseWrongPassword

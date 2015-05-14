@@ -5,7 +5,7 @@ from bson.json_util import dumps
 
 from models.logger import log
 from database import booksdb
-from views.templates.jsonresponse import JSONResponse
+from views.templates.JSONResponse import JSONResponse
 from utils.bookutils import isBookExist
 
 
@@ -60,9 +60,10 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
 def del_book(user_id, book_id):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
-    booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
+    updateResult = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
     print("User %s deleted book %s" % (user_id, book_id))
-    return JSONResponse(jsonify({'message': "Book %s deleted successful." % (book_id)}))
+    #return JSONResponse(jsonify({'message': "Book %s deleted successful." % (book_id)}))
+    return JSONResponse(updateResult)
 
 def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN=""):
     if not isBookExist(user_id, book_id):
