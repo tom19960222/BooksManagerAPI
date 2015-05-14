@@ -1,10 +1,9 @@
 #!/usr/bin/python
 #coding: UTF-8
 from flask import Blueprint, request
-from flask import jsonify
 
 from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
-from views.templates.jsonresponse import JSONResponse
+from views.JSONResponse.CommonJSONResponse import *
 import models.books
 
 
@@ -27,7 +26,7 @@ books = [
 def list_all_books():
     reqtoken = request.headers.get('Token')
     if not checkIsVaildUserWithToken(reqtoken):
-        return JSONResponse(jsonify({'message': 'Please log in first.'}), 401)
+        return JSONResponseLoginFirst
     response = models.books.list_all_books(get_user_id_by_token(reqtoken))
     return response.response_message, response.response_code
 
@@ -35,7 +34,7 @@ def list_all_books():
 def get_book_by_id(book_id):
     reqtoken = request.headers.get('Token')
     if not checkIsVaildUserWithToken(reqtoken):
-        return JSONResponse(jsonify({'message': 'Please log in first.'}), 401)
+        return JSONResponseLoginFirst
     response = models.books.get_book_by_id(get_user_id_by_token(reqtoken), book_id)
     return response.response_message, response.response_code
 
@@ -43,12 +42,12 @@ def get_book_by_id(book_id):
 def add_book():
     token = request.headers.get('Token')
     if not token:
-        return JSONResponse(jsonify({'message': 'Please provide token.'}), 401)
+        return JSONResponseProvideToken
     if not checkIsVaildUserWithToken(token):
-        return JSONResponse(jsonify({'message': 'Please login first.'}), 403) # User not login is not allow to add books.
+        return JSONResponseLoginFirst
     jsondata = request.get_json()
     if not jsondata:
-        return JSONResponse(jsonify({'message': 'Invaild JSON request.'}), 400)
+        return JSONResponseInvalidJSON
     if 'bookname' not in jsondata:
         return JSONResponse(jsonify({'message': 'Please provide at least book name.'}), 400)
 
@@ -81,9 +80,9 @@ def add_book():
 def del_book(book_id):
     token = request.headers.get('Token')
     if not token:
-        return JSONResponse(jsonify({'message': 'Please provide token.'}), 401)
+        return JSONResponseProvideToken
     if get_user_id_by_token(request.headers.get('Token')) == 0:
-        return JSONResponse(jsonify({'message': 'Please login first.'}), 403) # User not login is not allow to delete books.
+        return JSONResponseLoginFirst # User not login is not allow to delete books.
     tmpuserid = get_user_id_by_token(token)
     response = models.books.del_book(tmpuserid, book_id)
     return response.response_message, response.response_code
@@ -93,7 +92,7 @@ def update_book(book_id):
     tmpuserid = get_user_id_by_token(request.headers.get('Token'))
     jsondata = request.get_json()
     if not jsondata:
-        return JSONResponse(jsonify({'message': 'Invaild JSON request.'}), 400)
+        return JSONResponseInvalidJSON
 
     bookname = ""
     author = ""
