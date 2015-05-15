@@ -2,13 +2,14 @@
 import requests
 from bs4 import BeautifulSoup
 from views.templates.JSONResponse import JSONResponse
+import urllib
 
 
-url_search_base = 'http://search.books.com.tw/exep/prod_search.php?key='
+search_base_url = 'http://search.books.com.tw/exep/prod_search.php?key='
+book_search_base_url = 'http://search.books.com.tw/exep/prod_search.php?cat=1&key='
 
 def getProductLink(ISBN):
-    print('Getting ' + url_search_base+ISBN)
-    response = requests.get(url_search_base+ISBN)
+    response = requests.get(search_base_url+ISBN)
     response.encoding = 'utf-8'
     HTML = response.text
     soup = BeautifulSoup(HTML)
@@ -19,6 +20,19 @@ def getProductLink(ISBN):
 
     return booklink.get('href')
 
+def getProductLinks(bookname):
+    response = requests.get(book_search_base_url+bookname)
+    response.encoding = 'utf-8'
+    HTML = response.text
+    soup = BeautifulSoup(HTML)
+    resultlist = list()
+
+    for link in soup.find_all('a'):
+        if link.get('href').__contains__('mid&'):
+            resultlist.append(link.get('href'))
+
+    return resultlist
+
 def getProductInfoHTML(link):
     response = requests.get(link)
     response.encoding = 'utf-8'
@@ -27,7 +41,6 @@ def getProductInfoHTML(link):
 def getProductInfoStr(HTML):
     soup = BeautifulSoup(HTML)
     for s in soup.find_all('meta'):
-        print(s['content'])
         if s['content'].__contains__(u'書名'):
             result = s['content']
     return result
@@ -35,7 +48,6 @@ def getProductInfoStr(HTML):
 def getProductInfoPic(HTML):
     soup = BeautifulSoup(HTML)
     for s in soup.find_all('meta'):
-        print(s['content'])
         if s['content'].__contains__(u'getImage'):
             result = s['content']
     return result
@@ -53,3 +65,21 @@ def getProductInfoByISBN(ISBN):
             pass
     resultdict['cover_image_url'] = pic
     return JSONResponse(resultdict)
+
+def getProductInfoListByBookname(bookname):
+    resultlist = list()
+    for link in set(getProductLinks(bookname)):
+        resultdict = dict()
+        HTML = getProductInfoHTML(link)
+        info = getProductInfoStr(HTML).encode('utf-8')
+        pic = getProductInfoPic(HTML).encode('utf-8')
+        for s in info.split('，'):
+            try:
+                tmp = s.split('：')
+                resultdict[tmp[0]] = tmp[1]
+            except Exception:
+                pass
+        resultdict['cover_image_url'] = pic
+        resultlist.append(resultdict)
+
+    return JSONResponse(resultlist)

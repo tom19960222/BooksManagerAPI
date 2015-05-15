@@ -9,3 +9,8 @@ bookinfoapi = Blueprint('bookinfoapi', __name__, url_prefix='/api/bookinfo')
 def get_book_info(ISBN):
     response = models.utils.booksSearchAPI.getProductInfoByISBN(ISBN)
     return response.response_message, response.response_code
+
+@bookinfoapi.route('/search/<bookname>', methods=["GET"])
+def get_book_info_list(bookname):
+    response = models.utils.booksSearchAPI.getProductInfoListByBookname(bookname)
+    return response.response_message, response.response_code
