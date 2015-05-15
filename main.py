@@ -2,7 +2,6 @@
 from flask import Flask
 
 from controllers.booksapi import booksapi
-from controllers.tagsapi import tagsapi
 from controllers.usersapi import usersapi
 from controllers.tokenapi import tokenapi
 from controllers.loginapi import loginapi
@@ -10,7 +9,6 @@ from controllers.loginapi import loginapi
 
 app = Flask(__name__)
 app.register_blueprint(booksapi)
-app.register_blueprint(tagsapi)
 app.register_blueprint(usersapi)
 app.register_blueprint(tokenapi)
 app.register_blueprint(loginapi)
