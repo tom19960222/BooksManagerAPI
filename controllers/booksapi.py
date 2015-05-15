@@ -4,6 +4,7 @@ from flask import Blueprint, request
 
 from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
 from views.JSONResponse.CommonJSONResponse import *
+from views.JSONResponse.BookJSONResponse import *
 from views.templates.JSONResponse import makeResponse
 import models.books
 
@@ -50,7 +51,7 @@ def add_book():
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
     if 'bookname' not in jsondata:
-        return makeResponse(JSONResponse(jsonify({'message': 'Please provide at least book name.'}), 400))
+        return makeResponse(JSONResponseProvideAtLeastBookName)
 
     bookname = ""
     author = ""
@@ -58,6 +59,7 @@ def add_book():
     publish_date = ""
     price = ""
     ISBN = ""
+    tags = []
 
     if 'bookname' in jsondata:
         bookname = jsondata['bookname']
@@ -71,9 +73,11 @@ def add_book():
         price = jsondata['price']
     if 'ISBN' in jsondata:
         ISBN = jsondata['ISBN']
+    if 'tags' in jsondata:
+        tags = jsondata['tags']
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
-    response = models.books.add_book(user_id, bookname, author, publisher, publish_date, price, ISBN)
+    response = models.books.add_book(user_id, bookname, author, publisher, publish_date, price, ISBN, tags)
     return response.response_message, response.response_code
 
 
@@ -101,6 +105,7 @@ def update_book(book_id):
     publish_date = ""
     price = ""
     ISBN = ""
+    tags = []
 
     if 'bookname' in jsondata:
         bookname = jsondata['bookname']
@@ -114,6 +119,8 @@ def update_book(book_id):
         price = jsondata['price']
     if 'ISBN' in jsondata:
         ISBN = jsondata['ISBN']
+    if 'tags' in jsondata:
+        tags = jsondata['tags']
 
-    response = models.books.update_book(tmpuserid, book_id, bookname, author, publisher, publish_date, price, ISBN)
+    response = models.books.update_book(tmpuserid, book_id, bookname, author, publisher, publish_date, price, ISBN, tags)
     return response.response_message, response.response_code

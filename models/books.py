@@ -18,6 +18,7 @@ books = [
         'publish_date': '20150101',
         'price': 200,
         'ISBN': '1234567890',
+        'tags': ['QQ', 'QQQ'],
         'user_id': 1
     }
 ]
@@ -32,7 +33,7 @@ def get_book_by_id(user_id, book_id):
     tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
     return JSONResponse(dumps(tmpbooks))
 
-def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN=""):
+def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[]):
     new_book_id = 1
     tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
     for book in tmpbooks:
@@ -49,12 +50,13 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'price': price,
         'ISBN': ISBN,
         'user_id': user_id,
+        'tags': tags,
         'deleted': False
     }
 
     booksdb.insert(tmpbook)
-    print("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\"" \
-          % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN))
+    print("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\"" \
+          % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN, tags))
     return JSONResponse(dumps(tmpbook), 201)
 
 def del_book(user_id, book_id):
@@ -65,7 +67,7 @@ def del_book(user_id, book_id):
     #return JSONResponse(jsonify({'message': "Book %s deleted successful." % (book_id)}))
     return JSONResponse(updateResult)
 
-def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN=""):
+def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN="", tags=[]):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     if bookname != "":
@@ -86,6 +88,9 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
     if ISBN != "":
         booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'ISBN': ISBN}})
         log("Updated user %s's book %s's ISBN to %s" % (user_id, book_id, ISBN))
+    if tags:
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'tags': tags}})
+        log("Updated user %s's book %s's tags to %s" % (user_id, book_id, tags))
 
     tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]}) # Get updated data.
     return JSONResponse(dumps(tmpbook))
