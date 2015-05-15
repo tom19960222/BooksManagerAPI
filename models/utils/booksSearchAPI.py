@@ -20,7 +20,7 @@ def getProductLink(ISBN):
 
     return booklink.get('href')
 
-def getProductLinks(bookname):
+def getProductLinksList(bookname):
     response = requests.get(book_search_base_url+bookname)
     response.encoding = 'utf-8'
     HTML = response.text
@@ -33,10 +33,17 @@ def getProductLinks(bookname):
 
     return resultlist
 
-def getProductInfoHTML(link):
+def getHTMLByLink(link):
     response = requests.get(link)
     response.encoding = 'utf-8'
     return response.text
+
+def getBookname(HTML):
+    soup = BeautifulSoup(HTML)
+    for s in soup.find_all('meta'):
+        if s.get('name') == 'keywords':
+            result = s['content']
+    return result
 
 def getProductInfoStr(HTML):
     soup = BeautifulSoup(HTML)
@@ -48,35 +55,75 @@ def getProductInfoStr(HTML):
 def getProductInfoPic(HTML):
     soup = BeautifulSoup(HTML)
     for s in soup.find_all('meta'):
-        if s['content'].__contains__(u'getImage'):
+        if s['content'].__contains__('getImage'):
             result = s['content']
     return result
 
 def getProductInfoByISBN(ISBN):
     resultdict = dict()
-    HTML = getProductInfoHTML(getProductLink(ISBN))
+    HTML = getHTMLByLink(getProductLink(ISBN))
     info = getProductInfoStr(HTML).encode('utf-8')
     pic = getProductInfoPic(HTML).encode('utf-8')
+    bookname = getBookname(HTML).encode('utf-8')
     for s in info.split('，'):
         try:
             tmp = s.split('：')
-            resultdict[tmp[0]] = tmp[1]
+            if tmp[0] == '譯者':
+                resultdict['translater'] = tmp[1]
+            elif tmp[0] == 'ISBN':
+                resultdict['ISBN'] = tmp[1]
+            elif tmp[0] == '原文名稱':
+                resultdict['original_bookname'] = tmp[1]
+            elif tmp[0] == '類別':
+                resultdict['category'] = tmp[1]
+            elif tmp[0] == '語言':
+                resultdict['language'] = tmp[1]
+            elif tmp[0] == '作者':
+                resultdict['author'] = tmp[1]
+            elif tmp[0] == '出版社':
+                resultdict['publisher'] = tmp[1]
+            elif tmp[0] == '頁數':
+                resultdict['pages'] = tmp[1]
+            elif tmp[0] == '出版日期':
+                resultdict['publish_date'] = tmp[1].replace('/', '')
+            # resultdict[tmp[0]] = tmp[1]
         except Exception:
             pass
+    resultdict['bookname'] = bookname
     resultdict['cover_image_url'] = pic
     return JSONResponse(resultdict)
 
 def getProductInfoListByBookname(bookname):
     resultlist = list()
-    for link in set(getProductLinks(bookname)):
+    for link in set(getProductLinksList(bookname)):
         resultdict = dict()
-        HTML = getProductInfoHTML(link)
+        HTML = getHTMLByLink(link)
         info = getProductInfoStr(HTML).encode('utf-8')
         pic = getProductInfoPic(HTML).encode('utf-8')
         for s in info.split('，'):
             try:
                 tmp = s.split('：')
-                resultdict[tmp[0]] = tmp[1]
+                if tmp[0] == u'譯者':
+                    resultdict['translater'] = tmp[1]
+                elif tmp[0] == u'ISBN':
+                    resultdict['ISBN'] = tmp[1]
+                elif tmp[0] == u'原文名稱':
+                    resultdict['original_bookname'] = tmp[1]
+                elif tmp[0] == u'類別':
+                    resultdict['category'] = tmp[1]
+                elif tmp[0] == u'語言':
+                    resultdict['language'] = tmp[1]
+                elif tmp[0] == u'作者':
+                    resultdict['author'] = tmp[1]
+                elif tmp[0] == u'出版社':
+                    resultdict['publisher'] = tmp[1]
+                elif tmp[0] == u'書名':
+                    resultdict['bookname'] = tmp[1]
+                elif tmp[0] == u'頁數':
+                    resultdict['pages'] = tmp[1]
+                elif tmp[0] == u'出版日期':
+                    resultdict['publish_date'] = tmp[1]
+                #resultdict[tmp[0]] = tmp[1]
             except Exception:
                 pass
         resultdict['cover_image_url'] = pic

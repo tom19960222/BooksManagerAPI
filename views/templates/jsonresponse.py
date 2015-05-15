@@ -7,7 +7,7 @@ class JSONResponse:
     def __init__(self, response_dict_or_string="", response_code=200):
         if type(response_dict_or_string) is dict:
             self.response_message = dumps(response_dict_or_string)
-        if type(response_dict_or_string) is list:
+        elif type(response_dict_or_string) is list:
             self.response_message = dumps(response_dict_or_string)
         else:
             self.response_message = response_dict_or_string
