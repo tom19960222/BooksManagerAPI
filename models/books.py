@@ -19,6 +19,7 @@ books = [
         'price': 200,
         'ISBN': '1234567890',
         'tags': ['QQ', 'QQQ'],
+        'cover_images_url': 'http://i.imgur.com/zNPKpwk.jpg',
         'user_id': 1
     }
 ]
@@ -33,7 +34,7 @@ def get_book_by_id(user_id, book_id):
     tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
     return JSONResponse(dumps(tmpbooks))
 
-def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[]):
+def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[], cover_image_url='http://i.imgur.com/zNPKpwk.jpg'):
     new_book_id = 1
     tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
     for book in tmpbooks:
@@ -51,6 +52,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'ISBN': ISBN,
         'user_id': user_id,
         'tags': tags,
+        'cover_image_url': cover_image_url,
         'deleted': False
     }
 
@@ -67,7 +69,7 @@ def del_book(user_id, book_id):
     #return JSONResponse(jsonify({'message': "Book %s deleted successful." % (book_id)}))
     return JSONResponse(updateResult)
 
-def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN="", tags=[]):
+def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN="", tags=[], cover_image_url=""):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     if bookname != "":
@@ -91,6 +93,10 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
     if tags:
         booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'tags': tags}})
         log("Updated user %s's book %s's tags to %s" % (user_id, book_id, tags))
+    if cover_image_url != "":
+        booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'cover_image_url': cover_image_url}})
+        log("Updated user %s's book %s's cover_image_url to %s" % (user_id, book_id, cover_image_url))
+
 
     tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]}) # Get updated data.
     return JSONResponse(dumps(tmpbook))
