@@ -1,4 +1,6 @@
 from bson.json_util import dumps
+from models.logger import log
+
 
 def makeResponse(JSONResponse):
     return JSONResponse.response_message, JSONResponse.response_code
@@ -12,7 +14,7 @@ class JSONResponse:
         else:
             self.response_message = response_dict_or_string
         self.response_code = response_code
-        print("Created JSON response, return code=%s, message=%s" % (self.response_code, self.response_message))
+        log("Created JSON response, return code=%s, message=%s" % (self.response_code, self.response_message))
 
     def makeJSONResponse(self):
         if type(self.response_message) is dict:

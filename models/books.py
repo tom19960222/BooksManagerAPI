@@ -57,7 +57,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
     }
 
     booksdb.insert(tmpbook)
-    print("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\"" \
+    log("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\"" \
           % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN, tags))
     return JSONResponse(dumps(tmpbook), 201)
 
@@ -65,7 +65,7 @@ def del_book(user_id, book_id):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     updateResult = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
-    print("User %s deleted book %s" % (user_id, book_id))
+    log("User %s deleted book %s" % (user_id, book_id))
     #return JSONResponse(jsonify({'message': "Book %s deleted successful." % (book_id)}))
     return JSONResponse(updateResult)
 

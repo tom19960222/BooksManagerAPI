@@ -90,13 +90,13 @@ def update_user(user_id, username, password, email):
     return JSONResponse(dumps(tmpuser))
 
 def login(username, password, token):
-    print ("user %s is logging in, password = %s, token = %s" % (username, password, token))
+    log ("user %s is logging in, password = %s, token = %s" % (username, password, token))
     if time.time() > getTokenExpireTime(token):
         log("token %s expired" % (token))
         return JSONREsponseTokenExpired
     tmpuser = usersdb.find_one({'username': username})
     if tmpuser is None:
-        print("User %s not found." % (username))
+        log("User %s not found." % (username))
         return JSONResponseUserNotFound
     if tmpuser['password'] == password:
         changeTokenUser(token, tmpuser['user_id'])
