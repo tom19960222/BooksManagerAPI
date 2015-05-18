@@ -5,8 +5,8 @@ from views.templates.JSONResponse import JSONResponse
 import urllib
 
 
-search_base_url = 'http://search.books.com.tw/exep/prod_search.php?key='
-book_search_base_url = 'http://search.books.com.tw/exep/prod_search.php?cat=1&key='
+search_base_url = 'http://search.books.com.tw/exep/prod_search.php?sort=1&key='
+book_search_base_url = 'http://search.books.com.tw/exep/prod_search.php?sort=1&cat=1&key='
 
 def getProductLink(ISBN):
     response = requests.get(search_base_url+ISBN)
@@ -93,9 +93,18 @@ def getProductInfoByISBN(ISBN):
     resultdict['cover_image_url'] = pic
     return JSONResponse(resultdict)
 
+
+def removeTwiceDuplicated(List):
+    resultlist = list()
+    count = List.__len__()
+    for i in range(0, count-1, 2):
+        resultlist.append(List[i])
+    return resultlist
+
+
 def getProductInfoListByBookname(bookname):
     resultlist = list()
-    for link in set(getProductLinksList(bookname)):
+    for link in removeTwiceDuplicated(getProductLinksList(bookname)):
         resultdict = dict()
         HTML = getHTMLByLink(link)
         info = getProductInfoStr(HTML).encode('utf-8')
@@ -103,25 +112,25 @@ def getProductInfoListByBookname(bookname):
         for s in info.split('，'):
             try:
                 tmp = s.split('：')
-                if tmp[0] == u'譯者':
+                if tmp[0] == '譯者':
                     resultdict['translater'] = tmp[1]
-                elif tmp[0] == u'ISBN':
+                elif tmp[0] == 'ISBN':
                     resultdict['ISBN'] = tmp[1]
-                elif tmp[0] == u'原文名稱':
+                elif tmp[0] == '原文名稱':
                     resultdict['original_bookname'] = tmp[1]
-                elif tmp[0] == u'類別':
+                elif tmp[0] == '類別':
                     resultdict['category'] = tmp[1]
-                elif tmp[0] == u'語言':
+                elif tmp[0] == '語言':
                     resultdict['language'] = tmp[1]
-                elif tmp[0] == u'作者':
+                elif tmp[0] == '作者':
                     resultdict['author'] = tmp[1]
-                elif tmp[0] == u'出版社':
+                elif tmp[0] == '出版社':
                     resultdict['publisher'] = tmp[1]
-                elif tmp[0] == u'書名':
+                elif tmp[0] == '書名':
                     resultdict['bookname'] = tmp[1]
-                elif tmp[0] == u'頁數':
+                elif tmp[0] == '頁數':
                     resultdict['pages'] = tmp[1]
-                elif tmp[0] == u'出版日期':
+                elif tmp[0] == '出版日期':
                     resultdict['publish_date'] = tmp[1]
                 #resultdict[tmp[0]] = tmp[1]
             except Exception:
