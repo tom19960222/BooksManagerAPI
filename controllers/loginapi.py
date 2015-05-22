@@ -5,9 +5,9 @@ from views.JSONResponse.LoginJSONResponse import *
 import models.users
 
 
-loginapi = Blueprint('loginapi', __name__, url_prefix='/api/user/login')
+loginapi = Blueprint('loginapi', __name__, url_prefix='/api/user')
 
-@loginapi.route('', methods=['POST'])
+@loginapi.route('/login', methods=['POST'])
 def login():
     jsondata = request.get_json()
     if not jsondata:
@@ -20,3 +20,12 @@ def login():
 
     response = models.users.login(username, password, token)
     return response.response_message, response.response_code
+
+@loginapi.route('/logout', methods=['POST'])
+def logout():
+    token = request.headers.get('Token')
+    if not token:
+        return makeResponse(JSONResponseProvideNecessaryInfo)
+    response = models.users.logout(token)
+    return response.response_message, response.response_code
+
