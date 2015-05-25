@@ -3,8 +3,10 @@
 from flask import Blueprint, request
 
 from models.utils.userutils import get_user_id_by_token, checkIsVaildUserWithToken
+from models.utils.tokenutils import isTokenExpired
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.BookJSONResponse import *
+from views.JSONResponse.TokenJSONResponse import *
 from views.templates.JSONResponse import makeResponse
 import models.books
 
@@ -26,18 +28,26 @@ books = [
 
 @booksapi.route('', methods=['GET'])
 def list_all_books():
-    reqtoken = request.headers.get('Token')
-    if not checkIsVaildUserWithToken(reqtoken):
+    token = request.headers.get('Token')
+    if not token:
+        return makeResponse(JSONResponseProvideToken)
+    if not checkIsVaildUserWithToken(token):
         return makeResponse(JSONResponseLoginFirst)
-    response = models.books.list_all_books(get_user_id_by_token(reqtoken))
+    if isTokenExpired(token):
+        return makeResponse(JSONREsponseTokenExpired)
+    response = models.books.list_all_books(get_user_id_by_token(token))
     return response.response_message, response.response_code
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
-    reqtoken = request.headers.get('Token')
-    if not checkIsVaildUserWithToken(reqtoken):
+    token = request.headers.get('Token')
+    if not token:
+        return makeResponse(JSONResponseProvideToken)
+    if not checkIsVaildUserWithToken(token):
         return makeResponse(JSONResponseLoginFirst)
-    response = models.books.get_book_by_id(get_user_id_by_token(reqtoken), book_id)
+    if isTokenExpired(token):
+        return makeResponse(JSONREsponseTokenExpired)
+    response = models.books.get_book_by_id(get_user_id_by_token(token), book_id)
     return response.response_message, response.response_code
 
 @booksapi.route('', methods=['POST'])
@@ -47,6 +57,8 @@ def add_book():
         return makeResponse(JSONResponseProvideToken)
     if not checkIsVaildUserWithToken(token):
         return makeResponse(JSONResponseLoginFirst)
+    if isTokenExpired(token):
+        return makeResponse(JSONREsponseTokenExpired)
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
@@ -86,18 +98,25 @@ def del_book(book_id):
     token = request.headers.get('Token')
     if not token:
         return makeResponse(JSONResponseProvideToken)
-    if get_user_id_by_token(request.headers.get('Token')) == 0:
+    if not checkIsVaildUserWithToken(token):
         return makeResponse(JSONResponseLoginFirst) # User not login is not allow to delete books.
+    if isTokenExpired(token):
+        return makeResponse(JSONREsponseTokenExpired)
     tmpuserid = get_user_id_by_token(token)
     response = models.books.del_book(tmpuserid, book_id)
     return response.response_message, response.response_code
 
 @booksapi.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
-    tmpuserid = get_user_id_by_token(request.headers.get('Token'))
+    token = request.headers.get('Token')
+    tmpuserid = get_user_id_by_token(token)
     jsondata = request.get_json()
+    if not token:
+        return makeResponse(JSONResponseProvideToken)
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
+    if isTokenExpired(token):
+        return makeResponse(JSONREsponseTokenExpired)
 
     bookname = ""
     author = ""
