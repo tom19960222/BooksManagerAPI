@@ -73,9 +73,9 @@ def update_user(user_id, username, password, email):
     tmpuser = usersdb.find_one({'user_id': user_id})
     jsondata = request.get_json()
     if tmpuser is None:
-        JSONResponseUserNotFound
+        return JSONResponseUserNotFound
     if not jsondata:
-        JSONResponseInvalidJSON
+        return JSONResponseInvalidJSON
 
     if type(jsondata['username']) is unicode:
         usersdb.update({'user_id': user_id}, {'$set': {'username': username}})
