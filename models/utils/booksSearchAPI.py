@@ -1,7 +1,7 @@
 # coding: utf-8
 import requests
 from bs4 import BeautifulSoup
-from views.templates.JSONRespons import JSONResponse
+from views.templates.JSONResponse import JSONResponse
 import urllib
 
 

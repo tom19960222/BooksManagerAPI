@@ -6,7 +6,7 @@ from flask import jsonify
 from utils.tokenutils import generateAccessToken
 from models.database import tokensdb
 from models.logger import log
-from views.templates.JSONRespons import makeResponse
+from views.templates.JSONResponse import makeResponse
 from views.JSONResponse.TokenJSONResponse import *
 
 access_tokens = [

@@ -1,5 +1,5 @@
 from flask import Blueprint, abort, request
-from views.templates.JSONRespons import makeResponse
+from views.templates.JSONResponse import makeResponse
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *
 import models.users

@@ -1,4 +1,4 @@
-from views.templates.JSONRespons import JSONResponse
+from views.templates.JSONResponse import JSONResponse
 from json import dumps as jsonify
 
 JSONResponseProvideAtLeastBookName = JSONResponse(jsonify({'message': 'Please provide at least book name.'}), 400)

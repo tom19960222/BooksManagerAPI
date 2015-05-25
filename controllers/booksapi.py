@@ -7,7 +7,7 @@ from models.utils.tokenutils import isTokenExpired
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.BookJSONResponse import *
 from views.JSONResponse.TokenJSONResponse import *
-from views.templates.JSONRespons import makeResponse
+from views.templates.JSONResponse import makeResponse
 import models.books
 
 
