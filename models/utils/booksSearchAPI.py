@@ -102,7 +102,7 @@ def removeTwiceDuplicated(List):
     return resultlist
 
 
-def getProductInfoListByBookname(bookname):
+def searchProductInfoListByBookname(bookname):
     resultlist = list()
     for link in removeTwiceDuplicated(getProductLinksList(bookname)):
         resultdict = dict()

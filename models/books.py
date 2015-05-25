@@ -5,7 +5,7 @@ from bson.json_util import dumps
 
 from models.logger import log
 from database import booksdb
-from views.templates.JSONResponse import JSONResponse, makeResponse
+from views.templates.JSONResponse import JSONResponse
 from utils.bookutils import isBookExist
 
 

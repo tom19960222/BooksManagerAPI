@@ -8,6 +8,10 @@ def changeTokenUser(token, user_id):
 
 def getTokenExpireTime(token):
     tmptoken = tokensdb.find_one({'token': token})
+    if tmptoken is None:
+        return 0
+    if len(tmptoken) == 0:
+        return 0
     return tmptoken['expire_time']
 
 def generateAccessToken():
@@ -15,6 +19,8 @@ def generateAccessToken():
 
 def isValidToken(token):
     tmptoken = tokensdb.find_one({'token': token})
+    if tmptoken is None:
+        return False
     if len(tmptoken) == 0:
         return False
     return True

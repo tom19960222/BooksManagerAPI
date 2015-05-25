@@ -12,5 +12,5 @@ def get_book_info(ISBN):
 
 @bookinfoapi.route('/search/<bookname>', methods=["GET"])
 def get_book_info_list(bookname):
-    response = models.utils.booksSearchAPI.getProductInfoListByBookname(bookname)
+    response = models.utils.booksSearchAPI.searchProductInfoListByBookname(bookname)
     return response.response_message, response.response_code
