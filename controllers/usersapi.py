@@ -4,7 +4,7 @@ from flask import Blueprint, request
 from models.database import usersdb
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.UserJSONResponse import *
-from views.templates.JSONResponse import makeResponse
+from views.templates.JSONRespons import makeResponse
 import models.users
 
 usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')

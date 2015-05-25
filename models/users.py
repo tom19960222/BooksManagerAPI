@@ -12,7 +12,7 @@ from bson.json_util import dumps
 from models.database import usersdb
 from models.logger import log
 from utils.userutils import get_user_id_by_token
-from views.templates.JSONResponse import JSONResponse, makeResponse
+from views.templates.JSONRespons import JSONResponse, makeResponse
 from views.JSONResponse.UserJSONResponse import *
 from views.JSONResponse.TokenJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *

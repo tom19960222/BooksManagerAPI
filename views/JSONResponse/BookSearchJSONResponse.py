@@ -1,4 +1,4 @@
-from views.templates.JSONResponse import JSONResponse
+from views.templates.JSONRespons import JSONResponse
 from json import dumps as jsonify
 __author__ = 'Ikaros'
 JSONResponseISBNNotFound = JSONResponse(jsonify({'message': "ISBN not found"}), 404)
