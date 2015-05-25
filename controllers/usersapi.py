@@ -22,7 +22,7 @@ def get_user_by_id(user_id):
 @usersapi.route('', methods=['POST'])
 def add_user():
     jsondata = request.get_json()
-    if not jsondata or not 'username' in jsondata:
+    if not jsondata or 'username' not in jsondata:
         return makeResponse(JSONResponseInvalidJSON)
     username = jsondata['username']
     password = jsondata['password']
