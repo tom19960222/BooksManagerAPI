@@ -42,6 +42,8 @@ def get_user_by_id(user_id):
     return JSONResponse(dumps(tmpusers))
 
 def add_user(username, password, email):
+    if (usersdb.find_one({'email': email}) is not None):
+        return JSONResponseUserAlreadyExist
     tmpusers = usersdb.find().sort([('user_id', -1)]).limit(1)
     for user in tmpusers:
         lastuser = user
@@ -90,18 +92,18 @@ def update_user(user_id, username, password, email):
     tmpuser = usersdb.find_one({'user_id': user_id}) #Get updated data.
     return JSONResponse(dumps(tmpuser))
 
-def login(username, password, token):
-    log ("user %s is logging in, password = %s, token = %s" % (username, password, token))
+def login(email, password, token):
+    log ("user %s is logging in, password = %s, token = %s" % (email, password, token))
     if time.time() > getTokenExpireTime(token):
         log("token %s expired" % (token))
         return JSONREsponseTokenExpired
-    tmpuser = usersdb.find_one({'username': username})
+    tmpuser = usersdb.find_one({'email': email})
     if tmpuser is None:
-        log("User %s not found." % (username))
+        log("User %s not found." % (email))
         return JSONResponseUserNotFound
     if tmpuser['password'] == password:
         changeTokenUser(token, tmpuser['user_id'])
-        log("User %s logged in with token %s"% (username, token))
+        log("User %s logged in with token %s"% (email, token))
         return JSONResponseLoginSuccessful
     else:
         log("User %s logged in with wrong password")
