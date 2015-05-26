@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, request
+from flask import Blueprint, request
 from views.templates.JSONResponse import makeResponse
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *

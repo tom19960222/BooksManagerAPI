@@ -41,7 +41,7 @@ def get_user_by_id(user_id):
     return JSONResponse(dumps(tmpusers))
 
 def add_user(username, password, email):
-    if (usersdb.find_one({'email': email}) is not None):
+    if usersdb.find_one({'email': email}):
         return JSONResponseUserAlreadyExist
     tmpusers = usersdb.find().sort([('user_id', -1)]).limit(1)
 
@@ -100,16 +100,16 @@ def login(email, password, token):
         return JSONREsponseTokenExpired
     tmpuser = usersdb.find_one({'email': email})
     if tmpuser is None:
-        log("User %s not found." % (email))
+        log("User %s not found." % email)
         return JSONResponseUserNotFound
     if tmpuser['deactivated'] is True:
         return JSONResponseUserDeactivated
     if tmpuser['password'] == password:
         changeTokenUser(token, tmpuser['user_id'])
-        log("User %s logged in with token %s"% (email, token))
+        log("User %s logged in with token %s" % (email, token))
         return JSONResponseLoginSuccessful
     else:
-        log(("User %s logged in with wrong password") % (email))
+        log(("User %s logged in with wrong password") % email)
         return JSONResponseWrongPassword
 
 def logout(token):

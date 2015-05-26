@@ -64,7 +64,6 @@ def add_book():
         return makeResponse(JSONResponseInvalidJSON)
     if 'bookname' not in jsondata:
         return makeResponse(JSONResponseProvideAtLeastBookName)
-
     bookname = ""
     author = ""
     publisher = ""
