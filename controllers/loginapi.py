@@ -12,7 +12,7 @@ def login():
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    
+
     email = None
     password = None
     if 'email' in jsondata:

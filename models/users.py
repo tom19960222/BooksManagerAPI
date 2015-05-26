@@ -12,7 +12,6 @@ from bson.json_util import dumps
 from models.database import usersdb
 from models.logger import log
 from utils.userutils import get_user_id_by_token
-from views.templates.JSONResponse import JSONResponse, makeResponse
 from views.JSONResponse.UserJSONResponse import *
 from views.JSONResponse.TokenJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *
@@ -45,10 +44,12 @@ def add_user(username, password, email):
     if (usersdb.find_one({'email': email}) is not None):
         return JSONResponseUserAlreadyExist
     tmpusers = usersdb.find().sort([('user_id', -1)]).limit(1)
+
+    lastuser = None
     for user in tmpusers:
         lastuser = user
     new_user_id = 1
-    if lastuser['user_id'] is not None:
+    if lastuser is not None and 'user_id' in lastuser:
         new_user_id = int(lastuser['user_id'])+1
 
     tmpuser = {
