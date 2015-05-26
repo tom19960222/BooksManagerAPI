@@ -45,8 +45,12 @@ def update_user(user_id):
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
 
-    username = jsondata['username']
-    password = jsondata['password']
-    email = jsondata['email']
-    response = models.users.update_user(user_id, username, password, email)
+    username = ""
+    password = ""
+
+    if 'username' in jsondata:
+        username = jsondata['username']
+    if 'password' in jsondata:
+        password = jsondata['password']
+    response = models.users.update_user(user_id, username, password)
     return response.response_message, response.response_code

@@ -6,9 +6,7 @@ from models.utils.tokenutils import getTokenExpireTime, changeTokenUser
 
 #!/usr/bin/python
 # coding: UTF-8
-from flask import abort, request
 from bson.json_util import dumps
-
 from models.database import usersdb
 from models.logger import log
 from utils.userutils import get_user_id_by_token
@@ -67,26 +65,20 @@ def add_user(username, password, email):
 def del_user(user_id):
     tmpuser = usersdb.find_one({'user_id': user_id})
     if tmpuser is None:
-        abort(404)
+        return JSONResponseUserNotFound
     tmpuser = usersdb.update({'user_id': user_id}, {'$set': {'deactivated': True}})
     log("User %s deactivated" % user_id)
     return JSONResponse(dumps(tmpuser))
 
-def update_user(user_id, username, password, email):
+def update_user(user_id, username, password):
     tmpuser = usersdb.find_one({'user_id': user_id})
-    jsondata = request.get_json()
     if tmpuser is None:
         return JSONResponseUserNotFound
-    if not jsondata:
-        return JSONResponseInvalidJSON
 
-    if type(jsondata['username']) is unicode:
+    if username != "":
         usersdb.update({'user_id': user_id}, {'$set': {'username': username}})
         log("Updated user %s's username to %s" % (user_id, username))
-    if type(jsondata['email']) is unicode:
-        usersdb.update({'user_id': user_id}, {'$set': {'email': email}})
-        log("Updated user %s's email to %s" % (user_id, email))
-    if type(jsondata['password']) is unicode:
+    if password != "":
         usersdb.update({'user_id': user_id}, {'$set': {'password': password}})
         log("Updated user %s's password to %s" % (user_id, password))
 
