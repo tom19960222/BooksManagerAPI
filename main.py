@@ -6,6 +6,7 @@ from controllers.usersapi import usersapi
 from controllers.tokenapi import tokenapi
 from controllers.loginapi import loginapi
 from controllers.bookinfoapi import bookinfoapi
+from controllers.fileuploadapi import fileuploadapi
 import sys
 
 app = Flask(__name__)
@@ -14,6 +15,7 @@ app.register_blueprint(usersapi)
 app.register_blueprint(tokenapi)
 app.register_blueprint(loginapi)
 app.register_blueprint(bookinfoapi)
+app.register_blueprint(fileuploadapi)
 
 if __name__ == '__main__':
     reload(sys)
