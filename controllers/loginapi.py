@@ -12,13 +12,18 @@ def login():
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    username = jsondata['username']
-    password = jsondata['password']
+    
+    email = None
+    password = None
+    if 'email' in jsondata:
+        email = jsondata['email']
+    if 'password' in jsondata:
+        password = jsondata['password']
     token = request.headers.get('Token')
-    if username is None or password is None or token is None:
+    if email is None or password is None or token is None:
         return makeResponse(JSONResponseProvideNecessaryInfo)
 
-    response = models.users.login(username, password, token)
+    response = models.users.login(email, password, token)
     return response.response_message, response.response_code
 
 @loginapi.route('/logout', methods=['POST'])
