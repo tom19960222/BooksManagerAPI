@@ -22,7 +22,8 @@ books = [
         'cover_images_url': 'http://i.imgur.com/zNPKpwk.jpg',
         'user_id': 1,
         'create_time': 1,
-        'update_time': 1
+        'update_time': 1,
+        'category': ['LightNovels']
     }
 ]
 
@@ -36,7 +37,8 @@ def get_book_by_id(user_id, book_id):
     tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
     return JSONResponse(dumps(tmpbooks))
 
-def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[], cover_image_url='http://i.imgur.com/zNPKpwk.jpg'):
+def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[],
+             cover_image_url='http://i.imgur.com/zNPKpwk.jpg', category=[]):
     new_book_id = 1
     tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
     for book in tmpbooks:
@@ -58,12 +60,13 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'cover_image_url': cover_image_url,
         'deleted': False,
         'create_time': nowtime,
-        'update_time': nowtime
+        'update_time': nowtime,
+        'category': category
     }
 
     booksdb.insert(tmpbook)
-    log("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\", create_time=\"%s\", update_time=\"%s\"" \
-          % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN, tags, nowtime, nowtime))
+    log("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\", create_time=\"%s\", update_time=\"%s\", categoey=\"%s\""
+          % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN, tags, nowtime, nowtime, category))
     return JSONResponse(dumps(tmpbook), 201)
 
 def del_book(user_id, book_id):
@@ -73,7 +76,7 @@ def del_book(user_id, book_id):
     log("User %s deleted book %s" % (user_id, book_id))
     return JSONResponse(updateResult)
 
-def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN="", tags=[], cover_image_url=""):
+def update_book(user_id, book_id, bookname="", author="", publisher="", publish_date="", price="", ISBN="", tags=[], cover_image_url="", category=[]):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     updated = 0
@@ -101,6 +104,9 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
     if cover_image_url != "":
         updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'cover_image_url': cover_image_url}})
         log("Updated user %s's book %s's cover_image_url to %s" % (user_id, book_id, cover_image_url))
+    if category:
+        updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'category': category}})
+        log("Updated user %s's book %s's category to %s" % (user_id, book_id, category))
     if updated:
         nowtime = time.time()
         booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'update_time': nowtime}})
