@@ -1,20 +1,20 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, abort
 from werkzeug.utils import secure_filename
-import os
+from models.fileupload import save_upload_file
+from models.utils.userutils import get_user_id_by_token
 
 fileuploadapi = Blueprint('fileuploadapi', __name__, url_prefix='/api/upload')
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-UPLOAD_FOLDER = os.getcwd()+'/uploads'
-
-
-def isAllowedFile(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
 @fileuploadapi.route('', methods=['POST'])
 def upload_file():
+    token = request.headers.get('Token')
+    if token is None:
+        abort(400)
+    user_id = get_user_id_by_token(token)
+    if user_id == 0:
+        abort(403)
+    print("%s: %s" % (token, user_id))
     f = request.files['cover_image']
-    
-    f.save(os.path.join(UPLOAD_FOLDER, secure_filename(f.filename)))
-    return UPLOAD_FOLDER
+    save_upload_file(f, user_id)
+
+    return "%s%s" % (request.url_root, secure_filename(f.filename))
