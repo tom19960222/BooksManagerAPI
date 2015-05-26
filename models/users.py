@@ -107,7 +107,7 @@ def login(email, password, token):
     if tmpuser['password'] == password:
         changeTokenUser(token, tmpuser['user_id'])
         log("User %s logged in with token %s" % (email, token))
-        return JSONResponseLoginSuccessful
+        return JSONResponse(dumps(tmpuser))
     else:
         log(("User %s logged in with wrong password") % email)
         return JSONResponseWrongPassword
