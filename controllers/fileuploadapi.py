@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 from views.JSONResponse.CommonJSONResponse import *
 from views.templates.JSONResponse import makeResponse
