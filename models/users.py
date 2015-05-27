@@ -34,7 +34,7 @@ def get_user_by_id(user_id):
         return JSONResponseUserNotFound
     return JSONResponse(dumps(tmpusers))
 
-def add_user(username, password, email):
+def add_user(username, password, email, token):
     if usersdb.find_one({'email': email}):
         return JSONResponseUserAlreadyExist
     tmpusers = usersdb.find().sort([('user_id', -1)]).limit(1)
@@ -55,6 +55,7 @@ def add_user(username, password, email):
     }
 
     usersdb.insert(tmpuser)
+    changeTokenUser(token, new_user_id)
     log("User %s created, username = %s, password = %s, email = %s" % (new_user_id, username, password, email))
     return JSONResponse(dumps(tmpuser))
 

@@ -2,6 +2,7 @@
 # coding: UTF-8
 from flask import Blueprint, request
 from models.database import usersdb
+from models.tokens import isErrorToken
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.UserJSONResponse import *
 from views.templates.JSONResponse import makeResponse
@@ -21,14 +22,17 @@ def get_user_by_id(user_id):
 
 @usersapi.route('', methods=['POST'])
 def add_user():
+    token = request.headers.get('Token')
+    ErrorResponse = isErrorToken(token)
+    if ErrorResponse is not None:
+        return makeResponse(ErrorResponse)
     jsondata = request.get_json()
     if not jsondata or 'username' not in jsondata:
         return makeResponse(JSONResponseInvalidJSON)
     username = jsondata['username']
     password = jsondata['password']
     email = jsondata['email']
-
-    response = models.users.add_user(username,password,email)
+    response = models.users.add_user(username, password, email, token)
     return response.response_message, response.response_code
 
 @usersapi.route('/<int:user_id>', methods=['DELETE'])
