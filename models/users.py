@@ -109,7 +109,7 @@ def logout(token):
     return JSONResponseUserLogoutSuccessful
 
 
-def checkErrorUserByToken(token):
+def checkUserErrorByToken(token):
     if get_user_id_by_token(token) == 0:
         return JSONResponseLoginFirst
     return None

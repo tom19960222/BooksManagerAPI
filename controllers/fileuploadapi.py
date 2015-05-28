@@ -21,4 +21,4 @@ def upload_file():
     f = request.files['cover_image']
     save_upload_file(f, user_id)
 
-    return jsonify({'cover_image_URL': "%s%s/%s" % (BASE_URL, user_id, secure_filename(f.filename))})
+    return jsonify({'cover_image_url': "%s%s/%s" % (BASE_URL, user_id, secure_filename(f.filename))})

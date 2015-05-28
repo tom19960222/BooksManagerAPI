@@ -4,7 +4,7 @@ from flask import Blueprint, request
 
 from models.utils.userutils import get_user_id_by_token
 from models.tokens import isErrorToken
-from models.users import checkErrorUserByToken
+from models.users import checkUserErrorByToken
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.BookJSONResponse import *
 from views.templates.JSONResponse import makeResponse
@@ -32,7 +32,7 @@ def list_all_books():
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    ErrorResponse = checkErrorUserByToken(token)
+    ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     response = models.books.list_all_books(get_user_id_by_token(token))
@@ -44,7 +44,7 @@ def get_book_by_id(book_id):
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    ErrorResponse = checkErrorUserByToken(token)
+    ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     response = models.books.get_book_by_id(get_user_id_by_token(token), book_id)
@@ -56,7 +56,7 @@ def add_book():
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    ErrorResponse = checkErrorUserByToken(token)
+    ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     jsondata = request.get_json()
@@ -106,7 +106,7 @@ def del_book(book_id):
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    ErrorResponse = checkErrorUserByToken(token)
+    ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     tmpuserid = get_user_id_by_token(token)
@@ -119,7 +119,7 @@ def update_book(book_id):
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    ErrorResponse = checkErrorUserByToken(token)
+    ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     jsondata = request.get_json()
