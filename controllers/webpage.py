@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template
-import os, datetime
+from flask import Blueprint, render_template, flash
+import datetime
 
 logpage = Blueprint('logpage', __name__, url_prefix='/log')
 
-@logpage.route('')
+@logpage.route('', methods=['GET'])
 def testpage():
     logtime = datetime.datetime.now().strftime("%Y-%m-%d")
     logfile = open(logtime+'.log', 'r')
