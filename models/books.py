@@ -2,7 +2,6 @@
 #coding: UTF-8
 from flask import jsonify
 from bson.json_util import dumps
-
 from models.logger import log
 from database import booksdb
 from views.templates.JSONResponse import JSONResponse

@@ -1,12 +1,5 @@
-import time
-
-from flask import jsonify
-
-from models.utils.tokenutils import getTokenExpireTime, changeTokenUser
-
 #!/usr/bin/python
 # coding: UTF-8
-from bson.json_util import dumps
 from models.database import usersdb
 from models.logger import log
 from utils.userutils import get_user_id_by_token
@@ -14,6 +7,9 @@ from views.JSONResponse.UserJSONResponse import *
 from views.JSONResponse.TokenJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *
 from views.JSONResponse.CommonJSONResponse import *
+from bson.json_util import dumps
+from models.utils.tokenutils import getTokenExpireTime, changeTokenUser
+import time
 
 users = [
     {
@@ -21,6 +17,7 @@ users = [
         'username': 'Anonymous',
         'email': '',
         'password': '',
+        'head_image_url': '',
         'lastlogintime': '2015/04/08 15:59',
         'lastloginip': '127.0.0.1',
         'deactivated': True
@@ -38,7 +35,7 @@ def get_user_by_id(user_id):
         return JSONResponseUserNotFound
     return JSONResponse(dumps(tmpusers))
 
-def add_user(username, password, email):
+def add_user(username, password, email, head_image_url, token):
     if usersdb.find_one({'email': email}):
         return JSONResponseUserAlreadyExist
     tmpusers = usersdb.find().sort([('user_id', -1)]).limit(1)
@@ -54,12 +51,14 @@ def add_user(username, password, email):
         'user_id': new_user_id,
         'username': username,
         'email': email,
+        'head_image_url': head_image_url,
         'password': password,
         'deactivated': False
     }
 
     usersdb.insert(tmpuser)
-    log("User %s created, username = %s, password = %s, email = %s" % (new_user_id, username, password, email))
+    changeTokenUser(token, new_user_id)
+    log("User %s created, username = %s, password = %s, email = %s, head_image_url = %s" % (new_user_id, username, password, email, head_image_url))
     return JSONResponse(dumps(tmpuser))
 
 def del_user(user_id):
@@ -70,7 +69,7 @@ def del_user(user_id):
     log("User %s deactivated" % user_id)
     return JSONResponse(dumps(tmpuser))
 
-def update_user(user_id, username, password):
+def update_user(user_id, username="", password="", head_image_url=""):
     tmpuser = usersdb.find_one({'user_id': user_id})
     if tmpuser is None:
         return JSONResponseUserNotFound
@@ -81,6 +80,9 @@ def update_user(user_id, username, password):
     if password != "":
         usersdb.update({'user_id': user_id}, {'$set': {'password': password}})
         log("Updated user %s's password to %s" % (user_id, password))
+    if head_image_url != "":
+        usersdb.update({'user_id': user_id}, {'$set': {'head_image_url': head_image_url}})
+        log("Updated user %s's head_image_url to %s" % (user_id, head_image_url))
 
     tmpuser = usersdb.find_one({'user_id': user_id}) #Get updated data.
     return JSONResponse(dumps(tmpuser))
@@ -102,10 +104,17 @@ def login(email, password, token):
         tmpuser["message"] = "Login successful"
         return JSONResponse(dumps(tmpuser))
     else:
-        log(("User %s logged in with wrong password") % email)
+        log("User %s logged in with wrong password" % email)
         return JSONResponseWrongPassword
+
 
 def logout(token):
     changeTokenUser(token, 0)
     log("user %s with token %s is logouted." % (get_user_id_by_token(token), token))
     return JSONResponseUserLogoutSuccessful
+
+
+def checkUserErrorByToken(token):
+    if get_user_id_by_token(token) == 0:
+        return JSONResponseLoginFirst
+    return None

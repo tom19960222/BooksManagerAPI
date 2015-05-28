@@ -1,13 +1,10 @@
-import time
-
-from bson.json_util import dumps
-from flask import jsonify
-
-from utils.tokenutils import generateAccessToken
+from utils.tokenutils import *
 from models.database import tokensdb
 from models.logger import log
 from views.templates.JSONResponse import makeResponse
 from views.JSONResponse.TokenJSONResponse import *
+from views.JSONResponse.CommonJSONResponse import *
+from bson.json_util import dumps
 
 access_tokens = [
     {
@@ -39,3 +36,12 @@ def getTokenInfoByToken(token):
         if len(tmptoken) == 0:
             return makeResponse(JSONResponseTokenNotFound)
     return JSONResponse(dumps(tmptoken))
+
+def isErrorToken(token):
+    if not token:
+        return JSONResponseProvideToken
+    if not isTokenExist(token):
+        return JSONResponseTokenNotFound
+    if isTokenExpired(token):
+        return JSONREsponseTokenExpired
+    return None

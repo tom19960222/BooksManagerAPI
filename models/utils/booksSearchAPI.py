@@ -2,7 +2,6 @@
 import requests
 from bs4 import BeautifulSoup
 from views.templates.JSONResponse import JSONResponse
-import urllib
 
 
 search_base_url = 'http://search.books.com.tw/exep/prod_search.php?sort=1&key='
@@ -20,6 +19,7 @@ def getProductLink(ISBN):
 
     return booklink.get('href')
 
+
 def getProductLinksList(bookname):
     response = requests.get(book_search_base_url+bookname)
     response.encoding = 'utf-8'
@@ -33,6 +33,7 @@ def getProductLinksList(bookname):
 
     return resultlist
 
+
 def getHTMLByLink(link):
     response = requests.get(link)
     response.encoding = 'utf-8'
@@ -45,6 +46,7 @@ def getBookname(HTML):
             result = s['content']
     return result
 
+
 def getProductInfoStr(HTML):
     soup = BeautifulSoup(HTML)
     for s in soup.find_all('meta'):
@@ -52,12 +54,14 @@ def getProductInfoStr(HTML):
             result = s['content']
     return result
 
+
 def getProductInfoPic(HTML):
     soup = BeautifulSoup(HTML)
     for s in soup.find_all('meta'):
         if s['content'].__contains__('getImage'):
             result = s['content']
     return result
+
 
 def getProductInfoByISBN(ISBN):
     resultdict = dict()

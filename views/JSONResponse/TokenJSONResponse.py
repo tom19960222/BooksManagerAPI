@@ -1,5 +1,5 @@
 from views.templates.JSONResponse import JSONResponse
-from json import dumps as jsonify
+from json import dumps
 __author__ = 'Ikaros'
-JSONREsponseTokenExpired = JSONResponse(jsonify({'message': "Token expired"}), 403)
-JSONResponseTokenNotFound = JSONResponse(jsonify({'message': "Token not found."}), 404)
+JSONREsponseTokenExpired = JSONResponse(dumps({'message': "Token expired"}), 403)
+JSONResponseTokenNotFound = JSONResponse(dumps({'message': "Token not found."}), 404)
