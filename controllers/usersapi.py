@@ -36,6 +36,7 @@ def add_user():
     username = jsondata['username']
     password = jsondata['password']
     email = jsondata['email']
+    head_image_url = ""
     if 'head_image_url' in jsondata:
         head_image_url = jsondata['head_image_url']
     response = models.users.add_user(username, password, email, head_image_url, token)
