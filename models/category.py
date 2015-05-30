@@ -35,10 +35,12 @@ def add_category(user_id, category_name):
         return JSONResponse(jsonify({'message': "Catagory %s already exist." % category_name}))
 
     new_category_id = 1
+    lastcata = dict()
+    lastcata['category_id'] = 1
     tmpcatas = categorysdb.find().sort([('category_id', -1)]).limit(1)
     for cata in tmpcatas:
         lastcata = cata
-    if lastcata['user_id'] is not None:
+    if lastcata['category_id'] is not None:
         new_category_id = int(lastcata['category_id'])+1
 
     category = [

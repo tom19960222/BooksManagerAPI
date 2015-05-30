@@ -73,22 +73,12 @@ def add_books_to_category(category_id):
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    if 'book_list' not in jsondata and 'book' not in jsondata:
+    if 'books' not in jsondata:
         return makeResponse(JSONResponseProvideNecessaryInfo)
 
     user_id = get_user_id_by_token(request.headers.get('Token'))
-    book_list = list()
-    book = 1
-
-    if 'book_list' in jsondata:
-        book_list = jsondata['book_list']
-    elif 'book' in jsondata:
-        book = jsondata['book']
-
-    if len(book_list) != 0:
-        response = models.category.add_books_to_category(user_id, category_id, book_list)
-    else:
-        response = models.category.add_books_to_category(user_id, category_id, book)
+    books = jsondata['books']
+    response = models.category.add_books_to_category(user_id, category_id, books)
     return response.response_message, response.response_code
 
 
@@ -126,20 +116,12 @@ def del_book_from_category(category_id):
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    if 'book_list' not in jsondata and 'book' not in jsondata:
+    if 'books' not in jsondata:
         return makeResponse(JSONResponseProvideNecessaryInfo)
 
-    book_list = list()
-    book = ""
     user_id = get_user_id_by_token(request.headers.get('Token'))
-    response = ""
-    if 'book_list' in jsondata:
-        book_list = jsondata['book_list']
-        response = models.category.del_books_from_category(user_id, category_id, book_list)
-    elif 'book' in jsondata:
-        book = jsondata['book']
-        response = models.category.del_books_from_category(user_id, category_id, book)
-
+    books = jsondata['books']
+    response = models.category.del_books_from_category(user_id, category_id, books)
     return response.response_message, response.response_code
 
 
