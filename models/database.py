@@ -6,4 +6,4 @@ tokensdb = db.tokens
 usersdb = db.users
 booksdb = db.books
 tagsdb = db.tags
-catagorysdb = db.catagorys
+categorysdb = db.categorys

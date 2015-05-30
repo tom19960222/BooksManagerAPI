@@ -8,7 +8,7 @@ from controllers.loginapi import loginapi
 from controllers.bookinfoapi import bookinfoapi
 from controllers.fileuploadapi import fileuploadapi
 from controllers.webpage import logpage
-from controllers.catagoryapi import catagoryapi
+from controllers.categoryapi import categoryapi
 import sys
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ app.register_blueprint(loginapi)
 app.register_blueprint(bookinfoapi)
 app.register_blueprint(fileuploadapi)
 app.register_blueprint(logpage)
-app.register_blueprint(catagoryapi)
+app.register_blueprint(categoryapi)
 
 if __name__ == '__main__':
     reload(sys)

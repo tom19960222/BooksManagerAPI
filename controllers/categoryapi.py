@@ -8,14 +8,14 @@ from models.users import checkUserErrorByToken
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.LoginJSONResponse import *
 from views.templates.JSONResponse import makeResponse
-import models.catagory
+import models.category
 
 
-catagoryapi = Blueprint('catagoryapi', __name__, url_prefix='/api/catagory')
+categoryapi = Blueprint('categoryapi', __name__, url_prefix='/api/category')
 
 
-@catagoryapi.route('', methods=['GET'])
-def list_all_catagory():
+@categoryapi.route('', methods=['GET'])
+def list_all_category():
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -23,11 +23,11 @@ def list_all_catagory():
     ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    response = models.catagory.list_all_catagory(get_user_id_by_token(token))
+    response = models.category.list_all_category(get_user_id_by_token(token))
     return response.response_message, response.response_code
 
-@catagoryapi.route('/<int:catagory_id>', methods=['GET'])
-def get_catagory_by_name(catagory_id):
+@categoryapi.route('/<int:category_id>', methods=['GET'])
+def get_category_by_name(category_id):
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -35,11 +35,11 @@ def get_catagory_by_name(catagory_id):
     ErrorResponse = checkUserErrorByToken(token)
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
-    response = models.catagory.get_catagory_by_id(get_user_id_by_token(token), catagory_id)
+    response = models.category.get_category_by_id(get_user_id_by_token(token), category_id)
     return response.response_message, response.response_code
 
-@catagoryapi.route('', methods=['POST'])
-def add_catagory():
+@categoryapi.route('', methods=['POST'])
+def add_category():
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -50,19 +50,19 @@ def add_catagory():
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    if 'catagory_name' not in jsondata:
+    if 'category_name' not in jsondata:
         return makeResponse(JSONResponseProvideNecessaryInfo)
 
-    catagory_name = jsondata['catagory_name']
+    category_name = jsondata['category_name']
 
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
-    response = models.catagory.add_catagory(user_id, catagory_name)
+    response = models.category.add_category(user_id, category_name)
     return response.response_message, response.response_code
 
 
-@catagoryapi.route('/<int:catagory_id>', methods=['POST'])
-def add_books_to_catagory(catagory_id):
+@categoryapi.route('/<int:category_id>', methods=['POST'])
+def add_books_to_category(category_id):
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -86,14 +86,14 @@ def add_books_to_catagory(catagory_id):
         book = jsondata['book']
 
     if len(book_list) != 0:
-        response = models.catagory.add_books_to_catagory(user_id, catagory_id, book_list)
+        response = models.category.add_books_to_category(user_id, category_id, book_list)
     else:
-        response = models.catagory.add_books_to_catagory(user_id, catagory_id, book)
+        response = models.category.add_books_to_category(user_id, category_id, book)
     return response.response_message, response.response_code
 
 
-@catagoryapi.route('', methods=['DELETE'])
-def del_catagory():
+@categoryapi.route('', methods=['DELETE'])
+def del_category():
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -106,15 +106,15 @@ def del_catagory():
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    if 'catagory_id' not in jsondata:
+    if 'category_id' not in jsondata:
         return makeResponse(JSONResponseProvideNecessaryInfo)
-    catagory_id = jsondata['catagory_id']
+    category_id = jsondata['category_id']
 
-    response = models.catagory.del_catagory(user_id, catagory_id)
+    response = models.category.del_category(user_id, category_id)
     return response.response_message, response.response_code
 
-@catagoryapi.route('/<int:catagory_id>', methods=['DELETE'])
-def del_book_from_catagory(catagory_id):
+@categoryapi.route('/<int:category_id>', methods=['DELETE'])
+def del_book_from_category(category_id):
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -135,17 +135,17 @@ def del_book_from_catagory(catagory_id):
     response = ""
     if 'book_list' in jsondata:
         book_list = jsondata['book_list']
-        response = models.catagory.del_books_from_catagory(user_id, catagory_id, book_list)
+        response = models.category.del_books_from_category(user_id, category_id, book_list)
     elif 'book' in jsondata:
         book = jsondata['book']
-        response = models.catagory.del_books_from_catagory(user_id, catagory_id, book)
+        response = models.category.del_books_from_category(user_id, category_id, book)
 
     return response.response_message, response.response_code
 
 
 
-@catagoryapi.route('/<int:catagory_id>', methods=['PUT'])
-def update_catagory(catagory_id):
+@categoryapi.route('/<int:category_id>', methods=['PUT'])
+def update_category(category_id):
     token = request.headers.get('Token')
     ErrorResponse = isErrorToken(token)
     if ErrorResponse is not None:
@@ -156,10 +156,10 @@ def update_catagory(catagory_id):
     jsondata = request.get_json()
     if not jsondata:
         return makeResponse(JSONResponseInvalidJSON)
-    if 'catagory_name' not in jsondata:
+    if 'category_name' not in jsondata:
         makeResponse(JSONResponseProvideNecessaryInfo)
-    catagory_name = jsondata['catagory_name']
+    category_name = jsondata['category_name']
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
-    response = models.catagory.update_catagory(user_id, catagory_id, catagory_name)
+    response = models.category.update_category(user_id, category_id, category_name)
     return response.response_message, response.response_code
