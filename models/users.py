@@ -11,8 +11,7 @@ from bson.json_util import dumps
 from models.utils.tokenutils import getTokenExpireTime, changeTokenUser
 import time
 
-users = [
-    {
+users = {
         'user_id': 0,
         'username': 'Anonymous',
         'email': '',
@@ -22,7 +21,6 @@ users = [
         'lastloginip': '127.0.0.1',
         'deactivated': True
     }
-]
 
 def list_all_users():
     return JSONResponse(dumps(usersdb.find({'deactivated': False})))
