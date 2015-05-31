@@ -1,5 +1,4 @@
-from flask import Blueprint, request, jsonify
-from werkzeug.utils import secure_filename
+from flask import Blueprint, request
 from views.JSONResponse.CommonJSONResponse import *
 from views.templates.JSONResponse import makeResponse
 from models.fileupload import save_book_cover_image, save_user_head_image

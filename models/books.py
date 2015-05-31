@@ -7,6 +7,7 @@ from database import booksdb
 from views.templates.JSONResponse import JSONResponse
 from utils.bookutils import isBookExist
 from category import *
+from fileupload import save_upload_file
 import time, json
 
 books = {
@@ -50,7 +51,7 @@ def get_book_by_id(user_id, book_id):
     return JSONResponse(book)
 
 def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[],
-             cover_image_url='http://i.imgur.com/zNPKpwk.jpg', category=[]):
+             cover_image_url='http://i.imgur.com/zNPKpwk.jpg', category=[], cover_image=""):
     new_book_id = 1
     tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
     for book in tmpbooks:
@@ -74,6 +75,12 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'create_time': nowtime,
         'update_time': nowtime,
     }
+    if cover_image != "":
+        save_result = save_upload_file(cover_image, user_id)
+        if save_result.response_code / 100 != 2:
+            return save_result
+        else:
+            tmpbook['cover_image_url'] = (json.loads(save_result.response_message))['cover_image_url']
     booksdb.insert(tmpbook)
     if type(category) is list:
         addresult = JSONResponse()
