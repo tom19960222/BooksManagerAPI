@@ -9,8 +9,7 @@ from utils.bookutils import isBookExist
 from category import *
 import time
 
-books = [
-    {
+books = {
         'book_id': 0,
         'bookname': u'雨港基隆 - 桐花雨',
         'author': u'東方紅',
@@ -25,7 +24,6 @@ books = [
         'update_time': 1,
         'category': ['LightNovels']
     }
-]
 
 def list_all_books(user_id):
     tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]})

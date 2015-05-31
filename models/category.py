@@ -9,15 +9,13 @@ from views.templates.JSONResponse import JSONResponse
 from utils.categoryutils import isCategoryExist
 from utils.bookutils import isBookExist
 
-category = [
-    {
+category = {
         'category_id': 1,
         'category_name': "GuanGuan\'s favorite",
         'user_id': 1,
         'book_list': [1, 3, 5],
         'deleted': False
     }
-]
 
 def list_all_category(user_id):
     tmpcategorys = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]})
@@ -43,15 +41,13 @@ def add_category(user_id, category_name):
     if lastcata['category_id'] is not None:
         new_category_id = int(lastcata['category_id'])+1
 
-    category = [
-        {
+    category = {
             'category_id': new_category_id,
             'category_name': category_name,
             'user_id': user_id,
             'book_list': [],
             'deleted': False
-        }
-    ]
+    }
 
     categorysdb.insert(category)
     log("User %s created a category, category_id = %s , category_name = %s" % (user_id, new_category_id, category_name))
