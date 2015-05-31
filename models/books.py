@@ -74,6 +74,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'create_time': nowtime,
         'update_time': nowtime,
     }
+    booksdb.insert(tmpbook)
     if type(category) is list:
         addresult = JSONResponse()
         for category_id in category:
@@ -81,9 +82,14 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
     elif type(category) is int:
         addresult = add_books_to_category(user_id, category, new_book_id)
     if int(addresult.response_code)/100 != 2:
-                return addresult
-    booksdb.insert(tmpbook)
+            return addresult
 
+
+    if type(category) is list:
+        tmpbook['category_id'] = category # category data is stored in categorysdb, so it is not inserted to booksdb.
+    elif type(category) is int:
+        tmpbook['category_id'] = list()
+        tmpbook['category_id'].append(category)
     log("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\", create_time=\"%s\", update_time=\"%s\", categoey=\"%s\""
           % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN, tags, nowtime, nowtime, category))
     return JSONResponse(dumps(tmpbook), 201)
