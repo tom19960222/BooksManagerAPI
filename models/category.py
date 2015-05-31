@@ -97,6 +97,9 @@ def update_category(user_id, cataogry_id, category_name=""):
         return JSONResponse(jsonify({'message': "category %s not found." % (cataogry_id)}), 404)
     updated = None
     if category_name != "":
+        oldCatagory = categorysdb.find_one({'$and': [{'user_id': user_id}, {'category_name': category_name}, {'deleted': False}]})
+        if oldCatagory is not None:
+            return JSONResponse(jsonify({'message': "Catagory %s already exist." % category_name}))
         updated = categorysdb.update({'$and': [{'user_id': user_id}, {'category_id': cataogry_id}]}, {'$set': {'category_name': category_name}})
         if updated is not None:
             log("Updated user %s's category %s's category_name to %s" % (user_id, cataogry_id, category_name))

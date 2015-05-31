@@ -54,7 +54,6 @@ def add_category():
         return makeResponse(JSONResponseProvideNecessaryInfo)
 
     category_name = jsondata['category_name']
-
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
     response = models.category.add_category(user_id, category_name)
@@ -141,6 +140,7 @@ def update_category(category_id):
     if 'category_name' not in jsondata:
         makeResponse(JSONResponseProvideNecessaryInfo)
     category_name = jsondata['category_name']
+
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
     response = models.category.update_category(user_id, category_id, category_name)
