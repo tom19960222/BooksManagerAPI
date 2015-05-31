@@ -74,10 +74,14 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'create_time': nowtime,
         'update_time': nowtime,
     }
-    for category_id in category:
-        addresult = add_books_to_category(user_id, category_id, new_book_id)
-        if int(addresult.response_code)/100 != 2:
-            return addresult
+    if type(category) is list:
+        addresult = JSONResponse()
+        for category_id in category:
+            addresult = add_books_to_category(user_id, category_id, new_book_id)
+    elif type(category) is int:
+        addresult = add_books_to_category(user_id, category, new_book_id)
+    if int(addresult.response_code)/100 != 2:
+                return addresult
     booksdb.insert(tmpbook)
 
     log("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\", create_time=\"%s\", update_time=\"%s\", categoey=\"%s\""
