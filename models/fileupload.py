@@ -4,7 +4,8 @@ from views.templates.JSONResponse import JSONResponse
 from bson.json_util import dumps
 from models.books import update_book
 from models.users import update_user
-import os, json
+import os
+import json
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 BASE_URL = 'http://163.13.128.116:5001/'

@@ -3,12 +3,12 @@
 from flask import jsonify
 from bson.json_util import dumps
 from models.logger import log
-from database import booksdb
+from database import booksdb, categorysdb
 from views.templates.JSONResponse import JSONResponse
 from utils.bookutils import isBookExist
-from category import *
-from fileupload import save_upload_file
-import time, json
+from category import add_books_to_category, del_books_from_category
+import time
+import json
 
 books = {
         'book_id': 0,
@@ -51,7 +51,7 @@ def get_book_by_id(user_id, book_id):
     return JSONResponse(book)
 
 def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[],
-             cover_image_url='http://i.imgur.com/zNPKpwk.jpg', category=[], cover_image=""):
+             cover_image_url='http://i.imgur.com/zNPKpwk.jpg', category=[]):
     new_book_id = 1
     tmpbooks = booksdb.find().sort([('book_id', -1)]).limit(1)
     for book in tmpbooks:
@@ -75,12 +75,6 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'create_time': nowtime,
         'update_time': nowtime,
     }
-    if cover_image != "":
-        save_result = save_upload_file(cover_image, user_id)
-        if save_result.response_code / 100 != 2:
-            return save_result
-        else:
-            tmpbook['cover_image_url'] = (json.loads(save_result.response_message))['cover_image_url']
     booksdb.insert(tmpbook)
     if type(category) is list:
         addresult = JSONResponse()
@@ -139,13 +133,8 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
     if cover_image_url != "":
         updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'cover_image_url': cover_image_url}})
         log("Updated user %s's book %s's cover_image_url to %s" % (user_id, book_id, cover_image_url))
-    # if category:
-    #     updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'category': category}})
-    #     log("Updated user %s's book %s's category to %s" % (user_id, book_id, category))
     if updated:
         nowtime = time.time()
         booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'update_time': nowtime}})
         log("Updated user %s's book %s's update_time to %s" % (user_id, book_id, nowtime))
-
-    # tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]}) # Get updated data.
     return get_book_by_id(user_id, book_id)
