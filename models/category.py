@@ -32,7 +32,7 @@ def get_category_by_id(user_id, category_id):
 def add_category(user_id, category_name):
     oldCatagory = categorysdb.find_one({'$and': [{'user_id': user_id}, {'category_name': category_name}, {'deleted': False}]})
     if oldCatagory is not None:
-        return JSONResponse(jsonify({'message': "Catagory %s already exist." % category_name}))
+        return JSONResponse(jsonify({'message': "Catagory %s already exist." % category_name}), 403)
 
     new_category_id = 1
     lastcata = dict()
