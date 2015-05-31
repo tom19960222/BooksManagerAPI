@@ -80,7 +80,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         if save_result.response_code / 100 != 2:
             return save_result
         else:
-            tmpbook['cover_image_url'] = (json.loads(save_upload_file(cover_image, user_id)))['cover_image_url']
+            tmpbook['cover_image_url'] = (json.loads(save_result.response_message))['cover_image_url']
     booksdb.insert(tmpbook)
     if type(category) is list:
         addresult = JSONResponse()
