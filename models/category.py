@@ -61,10 +61,12 @@ def add_books_to_category(user_id, category_id, book_list_or_int):
             if not isBookExist(user_id, book_id):
                 return JSONResponse(jsonify({'message': 'User %s doesn\'t own book %s' % (user_id, book_id)}))
         categorysdb.update({'$and': [{'user_id': user_id}, {'category_id': category_id}]}, {'$addToSet': {'book_list': {'$each': book_list_or_int}}})
-    else:
+    if type(book_list_or_int) is int:
         if not isBookExist(user_id, book_list_or_int):
             return JSONResponse(jsonify({'message': 'User %s doesn\'t own book %s' % (user_id, book_list_or_int)}))
         categorysdb.update({'$and': [{'user_id': user_id}, {'category_id': category_id}]}, {'$addToSet': {'book_list': book_list_or_int}})
+    else:
+        return JSONResponse(jsonify({'message': 'Wrong book_id data type provided.'}), 400)
     tmpcategory = categorysdb.find_one({'$and': [{'user_id': user_id}, {'category_id': category_id}]})
     log("User %s added books %s to category %s" % (user_id, book_list_or_int, category_id))
     return JSONResponse(dumps(tmpcategory), 200)
