@@ -22,7 +22,7 @@ books = {
         'user_id': 1,
         'create_time': 1,
         'update_time': 1,
-        'category': ['LightNovels']
+        'category_id': [4, 5]
     }
 
 def list_all_books(user_id):
@@ -31,10 +31,10 @@ def list_all_books(user_id):
     booksjson = json.loads(dumps(tmpbooks))
     categoiesjson = json.loads(dumps(bookscategories))
     for book in booksjson:
-        book['category'] = list()
+        book['category_id'] = list()
         for category in categoiesjson:
             if book['book_id'] in category['book_list']:
-                book['category'].append(category['category_id'])
+                book['category_id'].append(category['category_id'])
     return JSONResponse(dumps(booksjson))
 
 def get_book_by_id(user_id, book_id):
@@ -44,9 +44,9 @@ def get_book_by_id(user_id, book_id):
     bookscategories = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}, {'book_list': book_id}]})
     book = json.loads(dumps(tmpbook))
     categoiesjson = json.loads(dumps(bookscategories))
-    book['category'] = list()
+    book['category_id'] = list()
     for category in categoiesjson:
-        book['category'].append(category['category_id'])
+        book['category_id'].append(category['category_id'])
     return JSONResponse(book)
 
 def add_book(user_id,bookname, author="", publisher="", publish_date="", price="", ISBN="", tags=[],
