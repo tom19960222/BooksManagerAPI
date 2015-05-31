@@ -6,6 +6,7 @@ from models.logger import log
 from database import booksdb
 from views.templates.JSONResponse import JSONResponse
 from utils.bookutils import isBookExist
+from category import *
 import time
 
 books = [
@@ -47,8 +48,8 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
     nowtime = time.time()
 
     tmpbook = {
-        'book_id' : new_book_id,
-        'bookname' : bookname,
+        'book_id': new_book_id,
+        'bookname': bookname,
         'author': author,
         'publisher': publisher,
         'publish_date': publish_date,
@@ -60,10 +61,13 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price="
         'deleted': False,
         'create_time': nowtime,
         'update_time': nowtime,
-        'category': category
     }
-
+    for category_id in category:
+        addresult = add_books_to_category(user_id, category_id, new_book_id)
+        if int(addresult.response_code)/100 != 2:
+            return addresult
     booksdb.insert(tmpbook)
+
     log("User %s created a book, id=%s, bookname=\"%s\", author=\"%s\", publisher=\"%s\", publish_date=\"%s\", price=\"%s\", ISBN=\"%s\" tags=\"%s\", create_time=\"%s\", update_time=\"%s\", categoey=\"%s\""
           % (user_id, new_book_id, bookname, author, publisher, publish_date, price, ISBN, tags, nowtime, nowtime, category))
     return JSONResponse(dumps(tmpbook), 201)

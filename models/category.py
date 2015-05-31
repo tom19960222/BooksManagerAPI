@@ -6,7 +6,7 @@ from bson.json_util import dumps
 from models.logger import log
 from database import categorysdb
 from views.templates.JSONResponse import JSONResponse
-from utils.categoryutils import isCatagoryExist
+from utils.categoryutils import isCategoryExist
 from utils.bookutils import isBookExist
 
 category = [
@@ -24,7 +24,7 @@ def list_all_category(user_id):
     return JSONResponse(dumps(tmpcategorys))
 
 def get_category_by_id(user_id, category_id):
-    if not isCatagoryExist(user_id, category_id):
+    if not isCategoryExist(user_id, category_id):
         return JSONResponse(jsonify({'message': "category %s not found." % (category_id)}), 404)
     tmpbooks = categorysdb.find({'$and': [{'user_id': user_id}, {'category_id': category_id}]})
     return JSONResponse(dumps(tmpbooks))
@@ -58,6 +58,8 @@ def add_category(user_id, category_name):
     return JSONResponse(dumps(category), 201)
 
 def add_books_to_category(user_id, category_id, book_list_or_int):
+    if not isCategoryExist(user_id, category_id):
+        return JSONResponse(jsonify({'message': 'category not found'}), 404)
     if type(book_list_or_int) is list:
         for book_id in book_list_or_int:
             if not isBookExist(user_id, book_id):
@@ -72,7 +74,7 @@ def add_books_to_category(user_id, category_id, book_list_or_int):
     return JSONResponse(dumps(tmpcategory), 200)
 
 def del_category(user_id, category_id):
-    if not isCatagoryExist(user_id, category_id):
+    if not isCategoryExist(user_id, category_id):
         return JSONResponse(jsonify({'message': "category %s not found." % category_id}), 404)
     updateResult = categorysdb.update({'$and': [{'user_id': user_id}, {'category_id': category_id}]}, {'$set': {'deleted': True}})
     log("User %s deleted category %s" % (user_id, category_id))
@@ -81,7 +83,7 @@ def del_category(user_id, category_id):
 
 def del_books_from_category(user_id, category_id, book_int_or_list):
     delresult = None
-    if not isCatagoryExist(user_id, category_id):
+    if not isCategoryExist(user_id, category_id):
         return JSONResponse(jsonify({'message': "category %s not found." % category_id}), 404)
     if type(book_int_or_list) is int:
         delresult = categorysdb.update({'$and': [{'user_id': user_id}, {'category_id': category_id}]}, {'$pull': {'book_list': book_int_or_list}})
@@ -93,7 +95,7 @@ def del_books_from_category(user_id, category_id, book_int_or_list):
 
 
 def update_category(user_id, cataogry_id, category_name=""):
-    if not isCatagoryExist(user_id, cataogry_id):
+    if not isCategoryExist(user_id, cataogry_id):
         return JSONResponse(jsonify({'message': "category %s not found." % (cataogry_id)}), 404)
     updated = None
     if category_name != "":
