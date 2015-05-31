@@ -19,9 +19,9 @@ def upload_file():
     if user_id == 0:
         return makeResponse(JSONResponseLoginFirst)
     f = request.files['cover_image']
-    save_upload_file(f, user_id)
+    response = save_upload_file(f, user_id)
 
-    return jsonify({'cover_image_url': "%s%s/%s" % (BASE_URL, user_id, secure_filename(f.filename))})
+    return response.response_message, response.response_code
 
 @fileuploadapi.route('/user_head_image', methods=['POST'])
 def upload_user_head():

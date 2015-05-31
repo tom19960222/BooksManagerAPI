@@ -74,6 +74,7 @@ def add_book():
     tags = []
     cover_image_url = ""
     category_id=[]
+    cover_image = ""
 
     if 'bookname' in jsondata:
         bookname = jsondata['bookname']
@@ -93,6 +94,8 @@ def add_book():
         cover_image_url = jsondata['cover_image_url']
     if 'category_id' in jsondata:
         category_id = jsondata['category_id']
+    if 'cover_image' in request.files:
+        cover_image = request.files['cover_image']
 
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
