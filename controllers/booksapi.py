@@ -69,7 +69,7 @@ def add_book():
     author = ""
     publisher = ""
     publish_date = ""
-    price = ""
+    price = 0
     ISBN = ""
     tags = []
     cover_image_url = ""
@@ -131,7 +131,7 @@ def update_book(book_id):
     author = ""
     publisher = ""
     publish_date = ""
-    price = ""
+    price = 0
     ISBN = ""
     tags = []
     cover_image_url = ""
