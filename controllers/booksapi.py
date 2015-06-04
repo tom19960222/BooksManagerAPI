@@ -5,6 +5,7 @@ from flask import Blueprint, request
 from models.utils.userutils import get_user_id_by_token
 from models.tokens import isErrorToken
 from models.users import checkUserErrorByToken
+from models.utils.commonutils import isfloat
 from views.JSONResponse.CommonJSONResponse import *
 from views.JSONResponse.BookJSONResponse import *
 from views.templates.JSONResponse import makeResponse
@@ -73,7 +74,7 @@ def add_book():
     ISBN = ""
     tags = []
     cover_image_url = ""
-    category_id=[]
+    category_id = []
 
     if 'bookname' in jsondata:
         bookname = jsondata['bookname']
@@ -93,6 +94,9 @@ def add_book():
         cover_image_url = jsondata['cover_image_url']
     if 'category_id' in jsondata:
         category_id = jsondata['category_id']
+
+    if not isfloat(price):
+        return makeResponse(JSONResponsePriceNotNumber)
 
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
@@ -152,6 +156,9 @@ def update_book(book_id):
         tags = jsondata['tags']
     if 'cover_image_url' in jsondata:
         cover_image_url = jsondata['cover_image_url']
+
+    if not isfloat(price):
+        return makeResponse(JSONResponsePriceNotNumber)
 
     response = models.books.update_book(tmpuserid, book_id, bookname, author, publisher, publish_date, price, ISBN, tags, cover_image_url)
     return response.response_message, response.response_code

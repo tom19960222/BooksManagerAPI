@@ -59,6 +59,8 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price=0
     if lastbook['user_id'] is not None:
         new_book_id = int(lastbook['book_id'])+1
     nowtime = time.time()
+    if price == "":
+        price = 0
 
     tmpbook = {
         'book_id': new_book_id,
@@ -66,7 +68,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price=0
         'author': author,
         'publisher': publisher,
         'publish_date': publish_date,
-        'price': price,
+        'price': float(price),
         'ISBN': ISBN,
         'user_id': user_id,
         'tags': tags,
@@ -122,7 +124,7 @@ def update_book(user_id, book_id, bookname="", author="", publisher="", publish_
         updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'publish_date': publish_date}})
         log("Updated user %s's book %s's publish_date to %s" % (user_id, book_id, publish_date))
     if price != 0:
-        updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'price': price}})
+        updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'price': float(price)}})
         log("Updated user %s's book %s's price to %s" % (user_id, book_id, price))
     if ISBN != "":
         updated = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'ISBN': ISBN}})
