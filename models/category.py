@@ -18,13 +18,13 @@ category = {
     }
 
 def list_all_category(user_id):
-    tmpcategorys = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]})
+    tmpcategorys = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]}).sort('category_id', 1)
     return JSONResponse(dumps(tmpcategorys))
 
 def get_category_by_id(user_id, category_id):
     if not isCategoryExist(user_id, category_id):
         return JSONResponse(jsonify({'message': "category %s not found." % (category_id)}), 404)
-    tmpbooks = categorysdb.find({'$and': [{'user_id': user_id}, {'category_id': category_id}]})
+    tmpbooks = categorysdb.find_one({'$and': [{'user_id': user_id}, {'category_id': category_id}]})
     return JSONResponse(dumps(tmpbooks))
 
 def add_category(user_id, category_name):
