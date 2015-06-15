@@ -45,7 +45,7 @@ POST資料：
 
 
 ## 登入後可進行的各項操作
-* 書籍相關 
+* 書籍相關 /api/book
     * 取得 GET /api/book
     
     ```
@@ -157,4 +157,34 @@ POST資料：
     
     * 刪除 DELETE /api/book/<book_id>
     
+* 使用者相關 /api/user
+    * 取得自己的使用者資料 GET /api/user/<user_id>
+
+    ```
+{
+    "username": "哈哈哈XDD",
+    "_id": {
+        "$oid": "5576f59883dc492a0a165c86"
+    },
+    "user_id": 54,
+    "deactivated": false,
+    "head_image_url": "http://163.13.128.116:5001/54/head_images/10d11b58-f138-40fd-81c3-f2fd553542a5.png",
+    "password": "111",
+    "email": "哈哈哈"
+}
+```
+    * 新增使用者 POST /api/user (要提供token，註冊完畢token會自動對應新註冊的使用者)
+    
+    ```
+{
+    "username": "ikaros",
+    "email": "ikaros@gmail.com",
+    "password": "ikaros"
+}
+```
+    * 修改使用者 PUT /api/user/<user_id> (todo: 修改成用token對應user_id)
+    
+    	資料結構同新增使用者
+    	
+    * 刪除使用者 DELETE /api/user/<user_id> (todo: 修改成用token對應user_id)
     
