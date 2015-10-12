@@ -27,8 +27,8 @@ books = {
     }
 
 def list_all_books(user_id):
-    tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]})
-    bookscategories = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]})
+    tmpbooks = booksdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]}).sort('book_id', 1)
+    bookscategories = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}]}).sort('category_id', 1)
     booksjson = json.loads(dumps(tmpbooks))
     categoiesjson = json.loads(dumps(bookscategories))
     for book in booksjson:
@@ -42,7 +42,7 @@ def get_book_by_id(user_id, book_id):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
     tmpbook = booksdb.find_one({'$and': [{'user_id': user_id}, {'book_id': book_id}]})
-    bookscategories = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}, {'book_list': book_id}]})
+    bookscategories = categorysdb.find({'$and': [{'user_id': user_id}, {'deleted': False}, {'book_list': book_id}]}).sort('category_id', 1)
     book = json.loads(dumps(tmpbook))
     categoiesjson = json.loads(dumps(bookscategories))
     book['category_id'] = list()
@@ -100,7 +100,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price=0
 def del_book(user_id, book_id):
     if not isBookExist(user_id, book_id):
         return JSONResponse(jsonify({'message': "book %s not found." % (book_id)}), 404)
-    allcategories = categorysdb.find({'$and': [{'user_id': user_id}, {'book_list': book_id}]})
+    allcategories = categorysdb.find({'$and': [{'user_id': user_id}, {'book_list': book_id}]}).sort('category_id', 1)
     for category in allcategories:
         del_books_from_category(user_id, category['category_id'], book_id)
     updateResult = booksdb.update({'$and': [{'user_id': user_id}, {'book_id': book_id}]}, {'$set': {'deleted': True}})
