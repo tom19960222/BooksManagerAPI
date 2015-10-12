@@ -19,8 +19,8 @@ def upload_file(book_id):
     if 'cover_image' not in request.files:
         return makeResponse(JSONResponse(dumps({'message': 'No cover_image provided.'}), 400))
     f = request.files['cover_image']
-    save_result = save_book_cover_image(f, user_id, book_id)
-    return save_result.response_message, save_result.response_code
+    response = save_book_cover_image(f, user_id, book_id)
+    return response
 
 @fileuploadapi.route('/user_head_image', methods=['POST'])
 def upload_user_head():
@@ -34,5 +34,5 @@ def upload_user_head():
     if 'head_image' not in request.files:
         return makeResponse(JSONResponse(dumps({'message': 'No head_image provided.'}), 400))
     f = request.files['head_image']
-    saveresult = save_user_head_image(f, user_id)
-    return saveresult.response_message, saveresult.response_code
+    response = save_user_head_image(f, user_id)
+    return response

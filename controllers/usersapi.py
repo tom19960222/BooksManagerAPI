@@ -14,12 +14,12 @@ usersapi = Blueprint('userapi', __name__, url_prefix='/api/user')
 @usersapi.route('', methods=['GET'])
 def list_all_users():
     response = models.users.list_all_users()
-    return response.response_message, response.response_code
+    return response
 
 @usersapi.route('/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     response = models.users.get_user_by_id(user_id)
-    return response.response_message, response.response_code
+    return response
 
 @usersapi.route('', methods=['POST'])
 def add_user():
@@ -40,12 +40,12 @@ def add_user():
     if 'head_image_url' in jsondata:
         head_image_url = jsondata['head_image_url']
     response = models.users.add_user(username, password, email, head_image_url, token)
-    return response.response_message, response.response_code
+    return response
 
 @usersapi.route('/<int:user_id>', methods=['DELETE'])
 def del_user(user_id):
     response = models.users.del_user(user_id)
-    return response.response_message, response.response_code
+    return response
 
 @usersapi.route('/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
@@ -67,4 +67,4 @@ def update_user(user_id):
     if 'head_image_url' in jsondata:
         head_image_url = jsondata['head_image_url']
     response = models.users.update_user(user_id, username, password, head_image_url)
-    return response.response_message, response.response_code
+    return response

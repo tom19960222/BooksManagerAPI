@@ -38,18 +38,18 @@ def save_upload_file(file, user_id, subdir):
 
 def save_book_cover_image(file, user_id, book_id):
     save_result = save_upload_file(file, user_id, COVER_IMAGES_SUBDIR)
-    if save_result.response_code / 100 != 2:
+    if save_result.status_code / 100 != 2:
         return save_result
-    update_result = update_book(user_id, book_id, cover_image_url=json.loads(save_result.response_message)['cover_image_url'])
+    update_result = update_book(user_id, book_id, cover_image_url=json.loads(save_result.data)['cover_image_url'])
     if update_result.response_code / 100 != 2:
         return update_result
     return save_result
 
 def save_user_head_image(file, user_id):
     save_result = save_upload_file(file, user_id, HEAD_IMAGE_SUBDIR)
-    if save_result.response_code / 100 != 2:
+    if save_result.status_code / 100 != 2:
         return save_result
-    update_result = update_user(user_id, head_image_url=json.loads(save_result.response_message)['head_image_url'])
+    update_result = update_user(user_id, head_image_url=json.loads(save_result.data)['head_image_url'])
     if update_result.response_code / 100 != 2:
         return update_result
     return save_result

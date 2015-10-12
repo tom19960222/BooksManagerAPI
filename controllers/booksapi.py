@@ -37,7 +37,7 @@ def list_all_books():
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     response = models.books.list_all_books(get_user_id_by_token(token))
-    return response.response_message, response.response_code
+    return response
 
 @booksapi.route('/<int:book_id>', methods=['GET'])
 def get_book_by_id(book_id):
@@ -49,7 +49,7 @@ def get_book_by_id(book_id):
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     response = models.books.get_book_by_id(get_user_id_by_token(token), book_id)
-    return response.response_message, response.response_code
+    return response
 
 @booksapi.route('', methods=['POST'])
 def add_book():
@@ -101,7 +101,7 @@ def add_book():
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
     response = models.books.add_book(user_id, bookname, author, publisher, publish_date, price, ISBN, tags, cover_image_url, category_id)
-    return response.response_message, response.response_code
+    return response
 
 
 @booksapi.route('/<int:book_id>', methods=['DELETE'])
@@ -115,7 +115,7 @@ def del_book(book_id):
         return makeResponse(ErrorResponse)
     tmpuserid = get_user_id_by_token(token)
     response = models.books.del_book(tmpuserid, book_id)
-    return response.response_message, response.response_code
+    return response
 
 @booksapi.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
@@ -161,4 +161,4 @@ def update_book(book_id):
         return makeResponse(JSONResponsePriceNotNumber)
 
     response = models.books.update_book(tmpuserid, book_id, bookname, author, publisher, publish_date, price, ISBN, tags, cover_image_url)
-    return response.response_message, response.response_code
+    return response

@@ -84,7 +84,7 @@ def add_book(user_id,bookname, author="", publisher="", publish_date="", price=0
             addresult = add_books_to_category(user_id, category_id, new_book_id)
     elif type(category) is int:
         addresult = add_books_to_category(user_id, category, new_book_id)
-    if int(addresult.response_code)/100 != 2:
+    if int(addresult.status_code)/100 != 2:
             return addresult
 
 

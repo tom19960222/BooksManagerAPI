@@ -24,7 +24,7 @@ def login():
         return makeResponse(JSONResponseProvideNecessaryInfo)
 
     response = models.users.login(email, password, token)
-    return response.response_message, response.response_code
+    return response
 
 @loginapi.route('/logout', methods=['POST'])
 def logout():
@@ -32,5 +32,5 @@ def logout():
     if not token:
         return makeResponse(JSONResponseProvideNecessaryInfo)
     response = models.users.logout(token)
-    return response.response_message, response.response_code
+    return response
 

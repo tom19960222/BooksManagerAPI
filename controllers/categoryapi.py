@@ -24,7 +24,7 @@ def list_all_category():
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     response = models.category.list_all_category(get_user_id_by_token(token))
-    return response.response_message, response.response_code
+    return response
 
 @categoryapi.route('/<int:category_id>', methods=['GET'])
 def get_category_by_name(category_id):
@@ -36,7 +36,7 @@ def get_category_by_name(category_id):
     if ErrorResponse is not None:
         return makeResponse(ErrorResponse)
     response = models.category.get_category_by_id(get_user_id_by_token(token), category_id)
-    return response.response_message, response.response_code
+    return response
 
 @categoryapi.route('', methods=['POST'])
 def add_category():
@@ -57,7 +57,7 @@ def add_category():
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
     response = models.category.add_category(user_id, category_name)
-    return response.response_message, response.response_code
+    return response
 
 
 @categoryapi.route('/<int:category_id>', methods=['POST'])
@@ -78,7 +78,7 @@ def add_books_to_category(category_id):
     user_id = get_user_id_by_token(request.headers.get('Token'))
     books = jsondata['books']
     response = models.category.add_books_to_category(user_id, category_id, books)
-    return response.response_message, response.response_code
+    return response
 
 
 @categoryapi.route('', methods=['DELETE'])
@@ -100,7 +100,7 @@ def del_category():
     category_id = jsondata['category_id']
 
     response = models.category.del_category(user_id, category_id)
-    return response.response_message, response.response_code
+    return response
 
 @categoryapi.route('/<int:category_id>', methods=['DELETE'])
 def del_book_from_category(category_id):
@@ -121,7 +121,7 @@ def del_book_from_category(category_id):
     user_id = get_user_id_by_token(request.headers.get('Token'))
     books = jsondata['books']
     response = models.category.del_books_from_category(user_id, category_id, books)
-    return response.response_message, response.response_code
+    return response
 
 
 
@@ -144,4 +144,4 @@ def update_category(category_id):
     user_id = get_user_id_by_token(request.headers.get('Token'))
 
     response = models.category.update_category(user_id, category_id, category_name)
-    return response.response_message, response.response_code
+    return response
