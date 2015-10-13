@@ -88,7 +88,7 @@ def update_user(user_id, username="", password="", head_image_url=""):
 def login(email, password, token):
     log ("user %s is logging in, password = %s, token = %s" % (email, password, token))
     if time.time() > getTokenExpireTime(token):
-        log("token %s expired" % (token))
+        log("token %s expired" % token)
         return JSONREsponseTokenExpired
     tmpuser = usersdb.find_one({'email': email})
     if tmpuser is None:
